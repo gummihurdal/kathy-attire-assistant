@@ -272,7 +272,7 @@ export default function Mirror() {
         {/* ── MIDDLE: Style buttons ── */}
         <div style={styles.stylePanel}>
           <p className="section-label" style={{ marginBottom: '1.5rem' }}>Choose Your Style</p>
-          <div style={styles.styleButtons}>
+          <div style={styles.styleButtons} className="style-buttons-grid">
             {STYLES.map(s => (
               <motion.button
                 key={s.key}
@@ -280,6 +280,7 @@ export default function Mirror() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleStyleClick(s.key)}
                 disabled={generating}
+                className="style-btn"
                 style={{
                   ...styles.styleBtn,
                   borderColor: activeStyle === s.key ? s.color : 'var(--border)',
@@ -287,10 +288,10 @@ export default function Mirror() {
                   opacity: generating && activeStyle !== s.key ? 0.4 : 1,
                 }}
               >
-                <span style={{ ...styles.styleBtnIcon, color: activeStyle === s.key ? s.color : 'var(--ivory-faint)' }}>
+                <span className="style-btn-icon" style={{ ...styles.styleBtnIcon, color: activeStyle === s.key ? s.color : 'var(--ivory-faint)' }}>
                   {s.icon}
                 </span>
-                <span style={{ ...styles.styleBtnLabel, color: activeStyle === s.key ? 'var(--ivory)' : 'var(--ivory-dim)' }}>
+                <span className="style-btn-label" style={{ ...styles.styleBtnLabel, color: activeStyle === s.key ? 'var(--ivory)' : 'var(--ivory-dim)' }}>
                   {s.label}
                 </span>
                 {generating && activeStyle === s.key && (

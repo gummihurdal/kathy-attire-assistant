@@ -161,3 +161,11 @@ body.menu-open {
   position: fixed;
   width: 100%;
 }
+
+/* ── Mirror style buttons — compact on mobile ── */
+@media (max-width: 768px) {
+  .style-btn { padding: 0.55rem 0.75rem !important; }
+  .style-btn-label { font-size: 0.7rem !important; }
+  .style-btn-icon { font-size: 0.85rem !important; }
+  .style-buttons-grid { gap: 4px !important; }
+}
