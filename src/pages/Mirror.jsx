@@ -8,7 +8,7 @@ import {
   uploadProfilePhoto, saveProfilePhoto, getProfilePhotos,
   deleteProfilePhoto, getWardrobeItems, saveTryOnResult, getTryOnResults
 } from '../lib/supabase'
-import { selectOutfitForStyle, runVirtualTryOn, generateLookImage, STYLES } from '../lib/tryon'
+import { selectOutfitForStyle, runFullTryOn, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
 
 export default function Mirror() {
   const { user } = useAuth()
@@ -109,31 +109,42 @@ export default function Mirror() {
         .filter(i => i.image_url && !i.image_url.startsWith('data:'))
 
       let resultUrl = null
-      const imagePrompt = selectedOutfit.image_prompt || 
-        (selectedOutfit.selected_items || []).map((i) => i.name).join(', ') +
-        '. ' + (selectedOutfit.color_story || '')
+      const imagePrompt = selectedOutfit.image_prompt ||
+        (selectedOutfit.selected_items || []).map(i => i.name).join(', ') + '. ' + (selectedOutfit.color_story || '')
+      const topGarment = selectedOutfit.top_garment
+      const bottomGarment = selectedOutfit.bottom_garment
+      const hasPersonPhoto = selectedPhoto?.image_url && !selectedPhoto.image_url.startsWith('data:')
+      const hasAnyGarmentPhoto =
+        (topGarment?.image_url && !topGarment.image_url.startsWith('data:')) ||
+        (bottomGarment?.image_url && !bottomGarment.image_url.startsWith('data:'))
 
-      if (selectedPhoto?.image_url && !selectedPhoto.image_url.startsWith('data:')) {
-        // Flux Kontext Pro: redress Katherina's actual photo
+      if (hasPersonPhoto && hasAnyGarmentPhoto) {
+        // ✦ Best: chained IDM-VTON — applies top then bottom onto exact body, Flux finishes shoes/accessories
+        setPhase('generating')
         try {
-          const tryonResult = await runVirtualTryOn({
+          resultUrl = await runFullTryOn({
             personImageUrl: selectedPhoto.image_url,
+            topGarment,
+            bottomGarment,
             imagePrompt,
-            styleName: styleKey,
           })
-          resultUrl = tryonResult.result_url
         } catch (e) {
-          console.warn('Try-on failed, falling back to generation:', e.message)
+          console.warn('Full try-on failed, trying Flux:', e.message)
         }
       }
 
-      // Fallback: generate full fashion image with Flux 1.1 Pro
+      if (!resultUrl && hasPersonPhoto) {
+        // ✦ Good: Flux Kontext — complete style redress on her photo
+        try {
+          resultUrl = await runFluxTryOn({ personImageUrl: selectedPhoto.image_url, imagePrompt })
+        } catch (e) {
+          console.warn('Flux Kontext failed, generating look:', e.message)
+        }
+      }
+
       if (!resultUrl) {
-        const genResult = await generateLookImage({
-          imagePrompt,
-          styleName: styleKey,
-        })
-        resultUrl = genResult.result_url
+        // ✦ Fallback: pure AI fashion generation
+        resultUrl = await generateLookImage({ imagePrompt })
       }
 
       setResult(resultUrl)
@@ -186,7 +197,7 @@ export default function Mirror() {
         )}
       </div>
 
-      <div style={styles.layout} className="mirror-layout">
+      <div style={styles.layout}>
         {/* ── LEFT: Photo panel ── */}
         <div style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
@@ -339,7 +350,7 @@ export default function Mirror() {
         </div>
 
         {/* ── RIGHT: Result ── */}
-        <div style={styles.resultPanel} className="mirror-result">
+        <div style={styles.resultPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>
             {result ? `Styled — ${activeStyleObj?.label}` : 'Your Look Will Appear Here'}
           </p>
@@ -450,14 +461,6 @@ export default function Mirror() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-        @media (max-width: 900px) {
-          .mirror-layout { grid-template-columns: 1fr 1fr !important; }
-          .mirror-result { grid-column: 1 / -1; position: static !important; }
-        }
-        @media (max-width: 580px) {
-          .mirror-layout { grid-template-columns: 1fr !important; }
-          .mirror-photos { display: flex; flex-direction: row; gap: 1rem; }
-        }
       `}</style>
     </div>
   )
@@ -475,8 +478,8 @@ const styles = {
   },
   layout: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(160px, 220px) minmax(180px, 220px) 1fr',
-    gap: '1.5rem',
+    gridTemplateColumns: '220px 220px 1fr',
+    gap: '2rem',
     alignItems: 'start',
   },
   // Photo panel

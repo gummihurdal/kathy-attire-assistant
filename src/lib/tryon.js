@@ -16,16 +16,15 @@ async function callEdge(action, payload) {
   return data
 }
 
-// Poll until prediction completes
 async function pollUntilDone(predictionId, onProgress) {
   for (let i = 0; i < 60; i++) {
     await new Promise(r => setTimeout(r, 4000))
     const result = await callEdge('poll', { prediction_id: predictionId })
-    if (onProgress) onProgress(i, result.status)
+    if (onProgress) onProgress(result.status)
     if (result.status === 'succeeded' && result.result_url) return result.result_url
     if (result.status === 'failed') throw new Error(result.error || 'Generation failed')
   }
-  throw new Error('Timed out after 4 minutes')
+  throw new Error('Timed out')
 }
 
 // Step 1: Claude selects outfit
@@ -33,15 +32,37 @@ export async function selectOutfitForStyle({ wardrobeItems, style, personPhotoUr
   return callEdge('select_outfit', { wardrobeItems, style, personPhotoUrl })
 }
 
-// Step 2a: Flux Kontext Pro — redress person's actual photo
-export async function runVirtualTryOn({ personImageUrl, imagePrompt, styleName }, onProgress) {
-  const { prediction_id } = await callEdge('tryon', { personImageUrl, imagePrompt, styleName })
+// Step 2: Full chained try-on — top → bottom → Flux finish
+// Handles complete outfit including shorts + shoes for sporty etc.
+export async function runFullTryOn({ personImageUrl, topGarment, bottomGarment, imagePrompt }, onProgress) {
+  if (onProgress) onProgress('applying')
+  // This action runs all passes server-side and returns final result directly
+  const result = await callEdge('tryon_full', {
+    personImageUrl,
+    topGarment,
+    bottomGarment,
+    imagePrompt,
+  })
+  return result.result_url
+}
+
+// Single IDM-VTON pass (fire + poll)
+export async function runIDMVTON({ personImageUrl, garmentImageUrl, garmentDescription, garmentCategory }, onProgress) {
+  const { prediction_id } = await callEdge('tryon_idmvton', {
+    personImageUrl, garmentImageUrl, garmentDescription, garmentCategory
+  })
   return pollUntilDone(prediction_id, onProgress)
 }
 
-// Step 2b: Flux 1.1 Pro — generate fashion look (no person photo)
-export async function generateLookImage({ imagePrompt, styleName }, onProgress) {
-  const { prediction_id } = await callEdge('generate_look', { imagePrompt, styleName })
+// Flux Kontext — full style redress (no garment photos)
+export async function runFluxTryOn({ personImageUrl, imagePrompt }, onProgress) {
+  const { prediction_id } = await callEdge('tryon_flux', { personImageUrl, imagePrompt })
+  return pollUntilDone(prediction_id, onProgress)
+}
+
+// Flux 1.1 Pro — pure generation (no person photo)
+export async function generateLookImage({ imagePrompt }, onProgress) {
+  const { prediction_id } = await callEdge('generate_look', { imagePrompt })
   return pollUntilDone(prediction_id, onProgress)
 }
 
