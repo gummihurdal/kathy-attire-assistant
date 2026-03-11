@@ -62,7 +62,8 @@ export default function Advisor() {
   const { user } = useAuth()
   const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [phase, setPhase] = useState('idle') // idle | loading | done
+  const [phase, setPhase] = useState('idle') // idle | loading | done | error
+  const [errorMsg, setErrorMsg] = useState('')
   const [selectedOccasion, setSelectedOccasion] = useState('All')
   const [expandedOutfit, setExpandedOutfit] = useState(null)
   const [wardrobeItems, setWardrobeItems] = useState([])
@@ -84,10 +85,10 @@ export default function Advisor() {
       setPhase('done')
     } catch (e) {
       console.error(e)
-      setPhase('idle')
-      alert('Something went wrong — try again')
+      setErrorMsg(e.message || 'Something went wrong — please try again')
+      setPhase('error')
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const filteredOutfits = analysis?.outfit_suggestions?.filter(o =>
@@ -131,6 +132,23 @@ export default function Advisor() {
 
           {/* Loading */}
           {phase === 'loading' && <AdvisorLoading />}
+
+          {/* Error */}
+          {phase === 'error' && (
+            <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+              <p style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⚠️</p>
+              <p style={{ color: 'var(--ivory)', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', marginBottom: '0.75rem' }}>
+                Something went wrong
+              </p>
+              <p style={{ color: 'var(--stone)', fontFamily: 'Jost, sans-serif', fontSize: '0.85rem', marginBottom: '2rem', maxWidth: 320, margin: '0 auto 2rem' }}>
+                {errorMsg}
+              </p>
+              <button onClick={runAnalysis} className="btn-royal" style={{ fontSize: '0.9rem', padding: '0.875rem 2rem' }}>
+                ↺ Try Again
+              </button>
+            </motion.div>
+          )}
 
           {/* Results */}
           {phase === 'done' && analysis && (
