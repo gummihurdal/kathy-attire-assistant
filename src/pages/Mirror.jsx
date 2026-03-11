@@ -8,7 +8,7 @@ import {
   uploadProfilePhoto, saveProfilePhoto, getProfilePhotos,
   deleteProfilePhoto, getWardrobeItems, saveTryOnResult, getTryOnResults
 } from '../lib/supabase'
-import { selectOutfitForStyle, runIDMVTON, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
+import { selectOutfitForStyle, runFullTryOn, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
 
 export default function Mirror() {
   const { user } = useAuth()
@@ -111,32 +111,32 @@ export default function Mirror() {
       let resultUrl = null
       const imagePrompt = selectedOutfit.image_prompt ||
         (selectedOutfit.selected_items || []).map(i => i.name).join(', ') + '. ' + (selectedOutfit.color_story || '')
-      const primaryGarment = selectedOutfit.primary_garment
+      const topGarment = selectedOutfit.top_garment
+      const bottomGarment = selectedOutfit.bottom_garment
       const hasPersonPhoto = selectedPhoto?.image_url && !selectedPhoto.image_url.startsWith('data:')
-      const hasGarmentPhoto = primaryGarment?.image_url && !primaryGarment.image_url.startsWith('data:')
+      const hasAnyGarmentPhoto =
+        (topGarment?.image_url && !topGarment.image_url.startsWith('data:')) ||
+        (bottomGarment?.image_url && !bottomGarment.image_url.startsWith('data:'))
 
-      if (hasPersonPhoto && hasGarmentPhoto) {
-        // ✦ Best: IDM-VTON — composites actual garment photo onto Katherina's exact body
+      if (hasPersonPhoto && hasAnyGarmentPhoto) {
+        // ✦ Best: chained IDM-VTON — applies top then bottom onto exact body, Flux finishes shoes/accessories
         setPhase('generating')
         try {
-          resultUrl = await runIDMVTON({
+          resultUrl = await runFullTryOn({
             personImageUrl: selectedPhoto.image_url,
-            garmentImageUrl: primaryGarment.image_url,
-            garmentDescription: primaryGarment.description || primaryGarment.name,
-            garmentCategory: primaryGarment.category,
-          }, (status) => console.log('IDM-VTON:', status))
+            topGarment,
+            bottomGarment,
+            imagePrompt,
+          })
         } catch (e) {
-          console.warn('IDM-VTON failed, trying Flux Kontext:', e.message)
+          console.warn('Full try-on failed, trying Flux:', e.message)
         }
       }
 
       if (!resultUrl && hasPersonPhoto) {
-        // ✦ Good: Flux Kontext — style-based redress on her photo
+        // ✦ Good: Flux Kontext — complete style redress on her photo
         try {
-          resultUrl = await runFluxTryOn({
-            personImageUrl: selectedPhoto.image_url,
-            imagePrompt,
-          })
+          resultUrl = await runFluxTryOn({ personImageUrl: selectedPhoto.image_url, imagePrompt })
         } catch (e) {
           console.warn('Flux Kontext failed, generating look:', e.message)
         }

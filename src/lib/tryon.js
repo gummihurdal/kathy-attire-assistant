@@ -27,12 +27,26 @@ async function pollUntilDone(predictionId, onProgress) {
   throw new Error('Timed out')
 }
 
-// Step 1: Claude selects outfit + identifies primary garment
+// Step 1: Claude selects outfit
 export async function selectOutfitForStyle({ wardrobeItems, style, personPhotoUrl }) {
   return callEdge('select_outfit', { wardrobeItems, style, personPhotoUrl })
 }
 
-// Step 2a: IDM-VTON — composites actual garment photo onto person's body (best quality)
+// Step 2: Full chained try-on — top → bottom → Flux finish
+// Handles complete outfit including shorts + shoes for sporty etc.
+export async function runFullTryOn({ personImageUrl, topGarment, bottomGarment, imagePrompt }, onProgress) {
+  if (onProgress) onProgress('applying')
+  // This action runs all passes server-side and returns final result directly
+  const result = await callEdge('tryon_full', {
+    personImageUrl,
+    topGarment,
+    bottomGarment,
+    imagePrompt,
+  })
+  return result.result_url
+}
+
+// Single IDM-VTON pass (fire + poll)
 export async function runIDMVTON({ personImageUrl, garmentImageUrl, garmentDescription, garmentCategory }, onProgress) {
   const { prediction_id } = await callEdge('tryon_idmvton', {
     personImageUrl, garmentImageUrl, garmentDescription, garmentCategory
@@ -40,13 +54,13 @@ export async function runIDMVTON({ personImageUrl, garmentImageUrl, garmentDescr
   return pollUntilDone(prediction_id, onProgress)
 }
 
-// Step 2b: Flux Kontext Pro — style-based redress (when garment has no photo)
+// Flux Kontext — full style redress (no garment photos)
 export async function runFluxTryOn({ personImageUrl, imagePrompt }, onProgress) {
   const { prediction_id } = await callEdge('tryon_flux', { personImageUrl, imagePrompt })
   return pollUntilDone(prediction_id, onProgress)
 }
 
-// Step 2c: Flux 1.1 Pro — full generation (no person photo at all)
+// Flux 1.1 Pro — pure generation (no person photo)
 export async function generateLookImage({ imagePrompt }, onProgress) {
   const { prediction_id } = await callEdge('generate_look', { imagePrompt })
   return pollUntilDone(prediction_id, onProgress)
