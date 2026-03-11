@@ -186,7 +186,7 @@ export default function Mirror() {
         )}
       </div>
 
-      <div style={styles.layout}>
+      <div style={styles.layout} className="mirror-layout">
         {/* ── LEFT: Photo panel ── */}
         <div style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
@@ -339,7 +339,7 @@ export default function Mirror() {
         </div>
 
         {/* ── RIGHT: Result ── */}
-        <div style={styles.resultPanel}>
+        <div style={styles.resultPanel} className="mirror-result">
           <p className="section-label" style={{ marginBottom: '1rem' }}>
             {result ? `Styled — ${activeStyleObj?.label}` : 'Your Look Will Appear Here'}
           </p>
@@ -450,6 +450,14 @@ export default function Mirror() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @media (max-width: 900px) {
+          .mirror-layout { grid-template-columns: 1fr 1fr !important; }
+          .mirror-result { grid-column: 1 / -1; position: static !important; }
+        }
+        @media (max-width: 580px) {
+          .mirror-layout { grid-template-columns: 1fr !important; }
+          .mirror-photos { display: flex; flex-direction: row; gap: 1rem; }
+        }
       `}</style>
     </div>
   )
@@ -467,8 +475,8 @@ const styles = {
   },
   layout: {
     display: 'grid',
-    gridTemplateColumns: '220px 220px 1fr',
-    gap: '2rem',
+    gridTemplateColumns: 'minmax(160px, 220px) minmax(180px, 220px) 1fr',
+    gap: '1.5rem',
     alignItems: 'start',
   },
   // Photo panel
