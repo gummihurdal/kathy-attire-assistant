@@ -16,19 +16,40 @@ async function callEdge(action, payload) {
   return data
 }
 
-// Step 1: Claude selects outfit and writes image prompt
+async function pollUntilDone(predictionId, onProgress) {
+  for (let i = 0; i < 60; i++) {
+    await new Promise(r => setTimeout(r, 4000))
+    const result = await callEdge('poll', { prediction_id: predictionId })
+    if (onProgress) onProgress(result.status)
+    if (result.status === 'succeeded' && result.result_url) return result.result_url
+    if (result.status === 'failed') throw new Error(result.error || 'Generation failed')
+  }
+  throw new Error('Timed out')
+}
+
+// Step 1: Claude selects outfit + identifies primary garment
 export async function selectOutfitForStyle({ wardrobeItems, style, personPhotoUrl }) {
   return callEdge('select_outfit', { wardrobeItems, style, personPhotoUrl })
 }
 
-// Step 2a: Flux Kontext Pro — redress the actual photo of Katherina
-export async function runVirtualTryOn({ personImageUrl, imagePrompt, styleName }) {
-  return callEdge('tryon', { personImageUrl, imagePrompt, styleName })
+// Step 2a: IDM-VTON — composites actual garment photo onto person's body (best quality)
+export async function runIDMVTON({ personImageUrl, garmentImageUrl, garmentDescription, garmentCategory }, onProgress) {
+  const { prediction_id } = await callEdge('tryon_idmvton', {
+    personImageUrl, garmentImageUrl, garmentDescription, garmentCategory
+  })
+  return pollUntilDone(prediction_id, onProgress)
 }
 
-// Step 2b: Flux 1.1 Pro — full fashion image when no person photo
-export async function generateLookImage({ imagePrompt, styleName }) {
-  return callEdge('generate_look', { imagePrompt, styleName })
+// Step 2b: Flux Kontext Pro — style-based redress (when garment has no photo)
+export async function runFluxTryOn({ personImageUrl, imagePrompt }, onProgress) {
+  const { prediction_id } = await callEdge('tryon_flux', { personImageUrl, imagePrompt })
+  return pollUntilDone(prediction_id, onProgress)
+}
+
+// Step 2c: Flux 1.1 Pro — full generation (no person photo at all)
+export async function generateLookImage({ imagePrompt }, onProgress) {
+  const { prediction_id } = await callEdge('generate_look', { imagePrompt })
+  return pollUntilDone(prediction_id, onProgress)
 }
 
 export const STYLES = [
