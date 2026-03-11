@@ -72,7 +72,7 @@ export default function Advisor() {
     setLoading(true)
     setPhase('loading')
     try {
-      const items = await getWardrobeItems(user)
+      const items = await getWardrobeItems(user?.id || "demo")
       setWardrobeItems(items)
       if (items.length < 3) {
         alert('Add at least 3 items to your wardrobe first!')
