@@ -111,11 +111,8 @@ export default function UploadModal({ onClose, onSaved }) {
     setSaving(true)
     try {
       const userId = user?.id || 'demo'
-      let imageUrl = preview
-
-      if (user) {
-        imageUrl = await uploadClothingImage(file, userId)
-      }
+      // Always upload to Supabase — base64 fills localStorage and images are lost
+      let imageUrl = await uploadClothingImage(file, userId)
 
       const item = await saveWardrobeItem({
         user_id: userId,
