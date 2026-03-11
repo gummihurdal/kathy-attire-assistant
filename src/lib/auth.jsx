@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from './supabase'
 
 const AuthContext = createContext(null)
 
@@ -23,18 +23,27 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
-  const signUp = async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password })
+  const signUp = async (email, password, name = '') => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } }
+    })
     if (error) throw error
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // Force clear session even if signout fails
+      setUser(null)
+    }
   }
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   )
 }

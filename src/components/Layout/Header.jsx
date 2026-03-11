@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
-import { LogOut, Crown } from 'lucide-react'
+import { LogOut, Crown, Menu, X } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const NAV = [
-  { path: '/', label: 'Atelier' },
+  { path: '/', label: 'Home' },
   { path: '/wardrobe', label: 'Wardrobe' },
   { path: '/outfits', label: 'Outfits' },
   { path: '/lookbook', label: 'Lookbook' },
@@ -12,149 +13,149 @@ const NAV = [
 
 export default function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { user, signOut } = useAuth()
-  const [signingOut, setSigningOut] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleSignOut = async () => {
-    setSigningOut(true)
-    await signOut()
-    setSigningOut(false)
+    try {
+      await signOut()
+      toast.success('Signed out', { className: 'toast-royal' })
+      navigate('/')
+    } catch {
+      navigate('/')
+    }
   }
 
   return (
-    <header style={styles.header}>
-      {/* Top gold rule */}
-      <div style={styles.topRule} />
-
-      {/* Crown + Name */}
-      <div style={styles.inner}>
-        <div style={styles.brand}>
-          <Link to="/" style={styles.brandLink}>
-            <Crown size={14} color="var(--gold)" strokeWidth={1.5} />
+    <>
+      <header style={styles.header}>
+        <div style={styles.topRule} />
+        <div style={styles.inner}>
+          {/* Brand */}
+          <Link to="/" style={styles.brandLink} onClick={() => setMobileOpen(false)}>
+            <Crown size={13} color="var(--gold)" strokeWidth={1.5} />
             <span style={styles.brandName}>Kathy</span>
-            <span style={styles.brandSub}>·  Atelier Privé</span>
+            <span style={styles.brandSub}>· Atelier Privé</span>
           </Link>
-        </div>
 
-        <nav style={styles.nav}>
-          {NAV.map(({ path, label }) => {
-            const active = location.pathname === path
-            return (
-              <Link
-                key={path}
-                to={path}
-                style={{
+          {/* Desktop nav */}
+          <nav style={styles.nav}>
+            {NAV.map(({ path, label }) => {
+              const active = location.pathname === path
+              return (
+                <Link key={path} to={path} style={{
                   ...styles.navLink,
                   color: active ? 'var(--gold)' : 'var(--ivory-faint)',
                   borderBottom: active ? '1px solid var(--gold)' : '1px solid transparent',
-                }}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </nav>
+                }}>
+                  {label}
+                </Link>
+              )
+            })}
+          </nav>
 
-        <div style={styles.actions}>
+          {/* Actions */}
+          <div style={styles.actions}>
+            {user ? (
+              <div style={styles.userRow}>
+                <span style={styles.userEmail}>{user.email?.split('@')[0]}</span>
+                <button onClick={handleSignOut} style={styles.iconBtn} title="Sign out">
+                  <LogOut size={14} strokeWidth={1.5} />
+                </button>
+              </div>
+            ) : (
+              <Link to="/auth" style={styles.authLink}>Sign In</Link>
+            )}
+            {/* Mobile hamburger */}
+            <button style={styles.mobileBtn} onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
+            </button>
+          </div>
+        </div>
+        <div style={styles.bottomRule} />
+      </header>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div style={styles.mobileMenu}>
+          {NAV.map(({ path, label }) => (
+            <Link key={path} to={path} style={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              {label}
+            </Link>
+          ))}
           {user ? (
-            <button onClick={handleSignOut} style={styles.iconBtn} title="Sign out">
-              <LogOut size={14} strokeWidth={1.5} />
+            <button onClick={() => { handleSignOut(); setMobileOpen(false) }} style={styles.mobileSignOut}>
+              Sign Out
             </button>
           ) : (
-            <Link to="/auth" style={styles.authLink}>Sign in</Link>
+            <Link to="/auth" style={styles.mobileLink} onClick={() => setMobileOpen(false)}>Sign In</Link>
           )}
         </div>
-      </div>
-
-      {/* Bottom gold rule */}
-      <div style={styles.bottomRule} />
-    </header>
+      )}
+    </>
   )
 }
 
 const styles = {
   header: {
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-    background: 'rgba(8,8,8,0.95)',
-    backdropFilter: 'blur(20px)',
+    position: 'sticky', top: 0, zIndex: 100,
+    background: 'rgba(8,8,8,0.96)', backdropFilter: 'blur(20px)',
   },
   topRule: {
     height: '1px',
     background: 'linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%)',
     opacity: 0.6,
   },
-  bottomRule: {
-    height: '1px',
-    background: 'linear-gradient(90deg, transparent, var(--border), transparent)',
-  },
+  bottomRule: { height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' },
   inner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '1rem 2.5rem',
-    gap: '2rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '1rem 2.5rem', gap: '2rem',
   },
-  brand: {
-    minWidth: 180,
-  },
-  brandLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    textDecoration: 'none',
-  },
+  brandLink: { display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none', flexShrink: 0 },
   brandName: {
-    fontFamily: 'var(--font-display)',
-    fontSize: '1.25rem',
-    fontWeight: 500,
-    color: 'var(--ivory)',
-    fontStyle: 'italic',
-    letterSpacing: '0.04em',
+    fontFamily: 'var(--font-display)', fontSize: '1.25rem',
+    fontWeight: 500, color: 'var(--ivory)', fontStyle: 'italic', letterSpacing: '0.04em',
   },
-  brandSub: {
-    fontSize: '0.65rem',
-    letterSpacing: '0.18em',
-    color: 'var(--ivory-faint)',
-    textTransform: 'uppercase',
-    fontWeight: 400,
-  },
-  nav: {
-    display: 'flex',
-    gap: '2.5rem',
-    alignItems: 'center',
-  },
+  brandSub: { fontSize: '0.6rem', letterSpacing: '0.18em', color: 'var(--ivory-faint)', textTransform: 'uppercase' },
+  nav: { display: 'flex', gap: '2rem', alignItems: 'center' },
   navLink: {
-    textDecoration: 'none',
-    fontSize: '0.7rem',
-    letterSpacing: '0.15em',
-    textTransform: 'uppercase',
-    fontWeight: 400,
-    paddingBottom: '2px',
-    transition: 'color 0.2s, border-color 0.2s',
+    textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.15em',
+    textTransform: 'uppercase', fontWeight: 400, paddingBottom: '2px',
+    transition: 'color 0.2s', whiteSpace: 'nowrap',
   },
-  actions: {
-    minWidth: 180,
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
+  actions: { display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 },
+  userRow: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  userEmail: { fontSize: '0.65rem', color: 'var(--ivory-faint)', letterSpacing: '0.05em' },
   iconBtn: {
-    background: 'none',
-    border: 'none',
-    color: 'var(--ivory-faint)',
-    cursor: 'pointer',
-    padding: '4px',
-    transition: 'color 0.2s',
-    display: 'flex',
-    alignItems: 'center',
+    background: 'none', border: '1px solid var(--border)', color: 'var(--ivory-faint)',
+    cursor: 'pointer', width: 30, height: 30, display: 'flex', alignItems: 'center',
+    justifyContent: 'center', transition: 'color 0.2s, border-color 0.2s',
   },
   authLink: {
-    color: 'var(--gold)',
-    textDecoration: 'none',
-    fontSize: '0.7rem',
-    letterSpacing: '0.15em',
-    textTransform: 'uppercase',
-    fontWeight: 400,
+    color: 'var(--gold)', textDecoration: 'none', fontSize: '0.68rem',
+    letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 400,
+    border: '1px solid var(--gold-dark)', padding: '0.4rem 0.875rem',
+  },
+  mobileBtn: {
+    background: 'none', border: 'none', color: 'var(--ivory)', cursor: 'pointer',
+    display: 'none', padding: 4,
+    '@media(max-width:768px)': { display: 'flex' },
+  },
+  mobileMenu: {
+    position: 'fixed', top: 56, left: 0, right: 0, zIndex: 99,
+    background: 'var(--onyx)', borderBottom: '1px solid var(--border)',
+    display: 'flex', flexDirection: 'column', padding: '1rem',
+  },
+  mobileLink: {
+    color: 'var(--ivory-dim)', textDecoration: 'none', padding: '0.875rem 1rem',
+    fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase',
+    borderBottom: '1px solid var(--border)',
+  },
+  mobileSignOut: {
+    background: 'none', border: 'none', color: 'var(--ivory-faint)',
+    padding: '0.875rem 1rem', fontSize: '0.75rem', letterSpacing: '0.12em',
+    textTransform: 'uppercase', cursor: 'pointer', textAlign: 'left',
+    fontFamily: 'var(--font-body)',
   },
 }
