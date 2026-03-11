@@ -70,7 +70,7 @@ Respond ONLY valid JSON no backticks:
       const r = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions", {
         method: "POST",
         headers: { Authorization: `Bearer ${REPLICATE_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ input: { prompt, input_image: personImageUrl, aspect_ratio: "2:3", output_format: "webp", output_quality: 90, safety_tolerance: 3 } }),
+        body: JSON.stringify({ input: { prompt, input_image: personImageUrl, aspect_ratio: "2:3", output_format: "jpg", output_quality: 90, safety_tolerance: 3 } }),
       })
       const pred = await r.json()
       if (pred.error) throw new Error(pred.error)
