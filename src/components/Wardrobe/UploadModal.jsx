@@ -9,7 +9,7 @@ import { analyzeClothingItem } from '../../lib/claude'
 
 const CATEGORIES = [
   'tops', 'bottoms', 'dresses', 'outerwear', 'shoes',
-  'bags', 'accessories', 'activewear', 'swimwear', 'lingerie'
+  'bags', 'accessories', 'activewear',
 ]
 
 const COLORS = [

@@ -66,7 +66,7 @@ serve(async (req) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const blocks: any[] = [{
         type: "text",
-        text: `You are an elite personal stylist for Katherina.
+        text: `You are a personal stylist for Katherina, a teenage girl. All outfit suggestions must be age-appropriate, modest, and suitable for a young person. Never suggest revealing, provocative, or adult clothing.
 STYLE: ${style} — ${styleGuides[style] ?? style}
 
 WARDROBE: ${JSON.stringify(wardrobeItems.map((i: Record<string,unknown>) => ({
