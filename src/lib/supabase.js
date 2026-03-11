@@ -114,3 +114,90 @@ export async function deleteOutfit(id) {
   lsSet(LS_OUTFITS, lsGet(LS_OUTFITS).filter(i => i.id !== id))
   try { await supabase.from('saved_outfits').delete().eq('id', id) } catch {}
 }
+
+// ─────────────────────────────────────────────────────────
+// Profile Photos
+// ─────────────────────────────────────────────────────────
+
+const LS_PROFILE_PHOTOS = 'kathy_profile_photos'
+const LS_TRYON_RESULTS  = 'kathy_tryon_results'
+
+export async function uploadProfilePhoto(file, userId) {
+  try {
+    const ext = file.name.split('.').pop()
+    const filename = `${userId}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage
+      .from('profile-photos').upload(filename, file, { upsert: false })
+    if (error) throw error
+    const { data: { publicUrl } } = supabase.storage.from('profile-photos').getPublicUrl(filename)
+    return publicUrl
+  } catch {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+}
+
+export async function saveProfilePhoto(photo) {
+  try {
+    const { data, error } = await supabase.from('profile_photos').insert([photo]).select().single()
+    if (error) throw error
+    return data
+  } catch {
+    const photos = lsGet(LS_PROFILE_PHOTOS)
+    const newPhoto = { ...photo, id: lsUUID(), created_at: new Date().toISOString() }
+    lsSet(LS_PROFILE_PHOTOS, [newPhoto, ...photos])
+    return newPhoto
+  }
+}
+
+export async function getProfilePhotos(userId) {
+  try {
+    const { data, error } = await supabase.from('profile_photos').select('*')
+      .eq('user_id', userId).order('created_at', { ascending: false })
+    if (error) throw error
+    const ls = lsGet(LS_PROFILE_PHOTOS).filter(p => p.user_id === userId)
+    const dbIds = new Set(data.map(p => p.id))
+    return [...data, ...ls.filter(p => !dbIds.has(p.id))]
+  } catch {
+    return lsGet(LS_PROFILE_PHOTOS).filter(p => !userId || p.user_id === userId)
+  }
+}
+
+export async function deleteProfilePhoto(id, imageUrl) {
+  lsSet(LS_PROFILE_PHOTOS, lsGet(LS_PROFILE_PHOTOS).filter(p => p.id !== id))
+  try {
+    if (imageUrl && imageUrl.includes('/profile-photos/')) {
+      const path = imageUrl.split('/profile-photos/')[1]
+      if (path) await supabase.storage.from('profile-photos').remove([path])
+    }
+    await supabase.from('profile_photos').delete().eq('id', id)
+  } catch {}
+}
+
+export async function saveTryOnResult(result) {
+  try {
+    const { data, error } = await supabase.from('tryon_results').insert([result]).select().single()
+    if (error) throw error
+    return data
+  } catch {
+    const results = lsGet(LS_TRYON_RESULTS)
+    const newResult = { ...result, id: lsUUID(), created_at: new Date().toISOString() }
+    lsSet(LS_TRYON_RESULTS, [newResult, ...results])
+    return newResult
+  }
+}
+
+export async function getTryOnResults(userId) {
+  try {
+    const { data, error } = await supabase.from('tryon_results').select('*')
+      .eq('user_id', userId).order('created_at', { ascending: false })
+    if (error) throw error
+    return data
+  } catch {
+    return lsGet(LS_TRYON_RESULTS).filter(r => !userId || r.user_id === userId)
+  }
+}

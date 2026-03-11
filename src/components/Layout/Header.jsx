@@ -5,9 +5,10 @@ import { LogOut, Crown, Menu, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const NAV = [
-  { path: '/', label: 'Home' },
+  { path: '/',         label: 'Home' },
   { path: '/wardrobe', label: 'Wardrobe' },
-  { path: '/outfits', label: 'Outfits' },
+  { path: '/outfits',  label: 'Outfits' },
+  { path: '/mirror',   label: 'Mirror ✦' },
   { path: '/lookbook', label: 'Lookbook' },
 ]
 
@@ -18,13 +19,10 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleSignOut = async () => {
-    try {
-      await signOut()
-      toast.success('Signed out', { className: 'toast-royal' })
-      navigate('/')
-    } catch {
-      navigate('/')
-    }
+    try { await signOut() } catch {}
+    toast.success('Signed out', { className: 'toast-royal' })
+    navigate('/')
+    setMobileOpen(false)
   }
 
   return (
@@ -32,21 +30,20 @@ export default function Header() {
       <header style={styles.header}>
         <div style={styles.topRule} />
         <div style={styles.inner}>
-          {/* Brand */}
           <Link to="/" style={styles.brandLink} onClick={() => setMobileOpen(false)}>
             <Crown size={13} color="var(--gold)" strokeWidth={1.5} />
             <span style={styles.brandName}>Kathy</span>
             <span style={styles.brandSub}>· Atelier Privé</span>
           </Link>
 
-          {/* Desktop nav */}
           <nav style={styles.nav}>
             {NAV.map(({ path, label }) => {
               const active = location.pathname === path
+              const isMirror = path === '/mirror'
               return (
                 <Link key={path} to={path} style={{
                   ...styles.navLink,
-                  color: active ? 'var(--gold)' : 'var(--ivory-faint)',
+                  color: active ? 'var(--gold)' : isMirror ? 'var(--gold-light)' : 'var(--ivory-faint)',
                   borderBottom: active ? '1px solid var(--gold)' : '1px solid transparent',
                 }}>
                   {label}
@@ -55,7 +52,6 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Actions */}
           <div style={styles.actions}>
             {user ? (
               <div style={styles.userRow}>
@@ -67,7 +63,6 @@ export default function Header() {
             ) : (
               <Link to="/auth" style={styles.authLink}>Sign In</Link>
             )}
-            {/* Mobile hamburger */}
             <button style={styles.mobileBtn} onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
             </button>
@@ -76,7 +71,6 @@ export default function Header() {
         <div style={styles.bottomRule} />
       </header>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div style={styles.mobileMenu}>
           {NAV.map(({ path, label }) => (
@@ -84,13 +78,10 @@ export default function Header() {
               {label}
             </Link>
           ))}
-          {user ? (
-            <button onClick={() => { handleSignOut(); setMobileOpen(false) }} style={styles.mobileSignOut}>
-              Sign Out
-            </button>
-          ) : (
-            <Link to="/auth" style={styles.mobileLink} onClick={() => setMobileOpen(false)}>Sign In</Link>
-          )}
+          {user
+            ? <button onClick={handleSignOut} style={styles.mobileSignOut}>Sign Out</button>
+            : <Link to="/auth" style={styles.mobileLink} onClick={() => setMobileOpen(false)}>Sign In</Link>
+          }
         </div>
       )}
     </>
@@ -98,64 +89,22 @@ export default function Header() {
 }
 
 const styles = {
-  header: {
-    position: 'sticky', top: 0, zIndex: 100,
-    background: 'rgba(8,8,8,0.96)', backdropFilter: 'blur(20px)',
-  },
-  topRule: {
-    height: '1px',
-    background: 'linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%)',
-    opacity: 0.6,
-  },
+  header: { position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,8,0.96)', backdropFilter: 'blur(20px)' },
+  topRule: { height: '1px', background: 'linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%)', opacity: 0.6 },
   bottomRule: { height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' },
-  inner: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '1rem 2.5rem', gap: '2rem',
-  },
+  inner: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 2.5rem', gap: '2rem' },
   brandLink: { display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none', flexShrink: 0 },
-  brandName: {
-    fontFamily: 'var(--font-display)', fontSize: '1.25rem',
-    fontWeight: 500, color: 'var(--ivory)', fontStyle: 'italic', letterSpacing: '0.04em',
-  },
+  brandName: { fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 500, color: 'var(--ivory)', fontStyle: 'italic', letterSpacing: '0.04em' },
   brandSub: { fontSize: '0.6rem', letterSpacing: '0.18em', color: 'var(--ivory-faint)', textTransform: 'uppercase' },
-  nav: { display: 'flex', gap: '2rem', alignItems: 'center' },
-  navLink: {
-    textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.15em',
-    textTransform: 'uppercase', fontWeight: 400, paddingBottom: '2px',
-    transition: 'color 0.2s', whiteSpace: 'nowrap',
-  },
+  nav: { display: 'flex', gap: '1.75rem', alignItems: 'center' },
+  navLink: { textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 400, paddingBottom: '2px', transition: 'color 0.2s', whiteSpace: 'nowrap' },
   actions: { display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 },
   userRow: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   userEmail: { fontSize: '0.65rem', color: 'var(--ivory-faint)', letterSpacing: '0.05em' },
-  iconBtn: {
-    background: 'none', border: '1px solid var(--border)', color: 'var(--ivory-faint)',
-    cursor: 'pointer', width: 30, height: 30, display: 'flex', alignItems: 'center',
-    justifyContent: 'center', transition: 'color 0.2s, border-color 0.2s',
-  },
-  authLink: {
-    color: 'var(--gold)', textDecoration: 'none', fontSize: '0.68rem',
-    letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 400,
-    border: '1px solid var(--gold-dark)', padding: '0.4rem 0.875rem',
-  },
-  mobileBtn: {
-    background: 'none', border: 'none', color: 'var(--ivory)', cursor: 'pointer',
-    display: 'none', padding: 4,
-    '@media(max-width:768px)': { display: 'flex' },
-  },
-  mobileMenu: {
-    position: 'fixed', top: 56, left: 0, right: 0, zIndex: 99,
-    background: 'var(--onyx)', borderBottom: '1px solid var(--border)',
-    display: 'flex', flexDirection: 'column', padding: '1rem',
-  },
-  mobileLink: {
-    color: 'var(--ivory-dim)', textDecoration: 'none', padding: '0.875rem 1rem',
-    fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-    borderBottom: '1px solid var(--border)',
-  },
-  mobileSignOut: {
-    background: 'none', border: 'none', color: 'var(--ivory-faint)',
-    padding: '0.875rem 1rem', fontSize: '0.75rem', letterSpacing: '0.12em',
-    textTransform: 'uppercase', cursor: 'pointer', textAlign: 'left',
-    fontFamily: 'var(--font-body)',
-  },
+  iconBtn: { background: 'none', border: '1px solid var(--border)', color: 'var(--ivory-faint)', cursor: 'pointer', width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  authLink: { color: 'var(--gold)', textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 400, border: '1px solid var(--gold-dark)', padding: '0.4rem 0.875rem' },
+  mobileBtn: { background: 'none', border: 'none', color: 'var(--ivory)', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' },
+  mobileMenu: { position: 'fixed', top: 57, left: 0, right: 0, zIndex: 99, background: 'var(--onyx)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', padding: '0.5rem' },
+  mobileLink: { color: 'var(--ivory-dim)', textDecoration: 'none', padding: '0.875rem 1rem', fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', borderBottom: '1px solid var(--border)' },
+  mobileSignOut: { background: 'none', border: 'none', color: 'var(--ivory-faint)', padding: '0.875rem 1rem', fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--font-body)' },
 }
