@@ -109,34 +109,29 @@ export default function Mirror() {
         .filter(i => i.image_url && !i.image_url.startsWith('data:'))
 
       let resultUrl = null
+      const imagePrompt = selectedOutfit.image_prompt || 
+        (selectedOutfit.selected_items || []).map((i) => i.name).join(', ') +
+        '. ' + (selectedOutfit.color_story || '')
 
-      if (itemsWithImages.length > 0 && selectedPhoto.image_url && !selectedPhoto.image_url.startsWith('data:')) {
-        // Best case: real photos for both person and garment — use IDM-VTON
-        const primaryGarment = itemsWithImages.find(i =>
-          i.category === 'tops' || i.category === 'dresses'
-        ) || itemsWithImages[0]
-
+      if (selectedPhoto?.image_url && !selectedPhoto.image_url.startsWith('data:')) {
+        // Flux Kontext Pro: redress Katherina's actual photo
         try {
           const tryonResult = await runVirtualTryOn({
             personImageUrl: selectedPhoto.image_url,
-            garmentImageUrl: primaryGarment.image_url,
-            garmentCategory: primaryGarment.category,
-            outfitDescription: `${primaryGarment.name} — ${selectedOutfit.color_story || ''}`,
+            imagePrompt,
+            styleName: styleKey,
           })
           resultUrl = tryonResult.result_url
-        } catch {
-          // Fallback to generation
-          resultUrl = null
+        } catch (e) {
+          console.warn('Try-on failed, falling back to generation:', e.message)
         }
       }
 
-      // Fallback: generate AI image
+      // Fallback: generate full fashion image with Flux 1.1 Pro
       if (!resultUrl) {
-        const outfitDesc = (selectedOutfit.selected_items || [])
-          .map(i => i.name).join(', ')
         const genResult = await generateLookImage({
-          outfitDescription: `${outfitDesc}. ${selectedOutfit.color_story || ''}`,
-          style: styleKey,
+          imagePrompt,
+          styleName: styleKey,
         })
         resultUrl = genResult.result_url
       }

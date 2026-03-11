@@ -16,27 +16,27 @@ async function callEdge(action, payload) {
   return data
 }
 
-// Step 1: Claude selects outfit for style
+// Step 1: Claude selects outfit and writes image prompt
 export async function selectOutfitForStyle({ wardrobeItems, style, personPhotoUrl }) {
   return callEdge('select_outfit', { wardrobeItems, style, personPhotoUrl })
 }
 
-// Step 2a: Virtual try-on with real garment photo (best quality)
-export async function runVirtualTryOn({ personImageUrl, garmentImageUrl, garmentCategory, outfitDescription }) {
-  return callEdge('tryon', { personImageUrl, garmentImageUrl, garmentCategory, outfitDescription })
+// Step 2a: Flux Kontext Pro — redress the actual photo of Katherina
+export async function runVirtualTryOn({ personImageUrl, imagePrompt, styleName }) {
+  return callEdge('tryon', { personImageUrl, imagePrompt, styleName })
 }
 
-// Step 2b: Generate AI outfit image (when no garment photos available)
-export async function generateLookImage({ personDescription, outfitDescription, style }) {
-  return callEdge('generate_look', { personDescription, outfitDescription, style })
+// Step 2b: Flux 1.1 Pro — full fashion image when no person photo
+export async function generateLookImage({ imagePrompt, styleName }) {
+  return callEdge('generate_look', { imagePrompt, styleName })
 }
 
 export const STYLES = [
   { key: 'casual',       label: 'Casual',       icon: '☁️',  color: '#7a9e7e' },
-  { key: 'smart_casual', label: 'Smart Casual',  icon: '✦',   color: '#9e8a7a' },
-  { key: 'sporty',       label: 'Sporty',        icon: '◎',   color: '#7a8a9e' },
-  { key: 'business',     label: 'Business',      icon: '◈',   color: '#5a6a7e' },
-  { key: 'evening',      label: 'Evening',       icon: '◇',   color: '#7a5a8e' },
+  { key: 'smart_casual', label: 'Smart Casual',  icon: '✦',   color: '#b0956e' },
+  { key: 'sporty',       label: 'Sporty',        icon: '◎',   color: '#6e8fb0' },
+  { key: 'business',     label: 'Business',      icon: '◈',   color: '#7a8fa8' },
+  { key: 'evening',      label: 'Evening',       icon: '◇',   color: '#9b7ab5' },
   { key: 'formal',       label: 'Formal',        icon: '♛',   color: '#c9a84c' },
-  { key: 'weekend',      label: 'Weekend',       icon: '○',   color: '#8e7a5a' },
+  { key: 'weekend',      label: 'Weekend',       icon: '○',   color: '#a8956e' },
 ]
