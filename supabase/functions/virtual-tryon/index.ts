@@ -5,22 +5,6 @@ const cors = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 }
 
-async function pollReplicate(predictionId: string, apiKey: string): Promise<string> {
-  for (let i = 0; i < 40; i++) {
-    await new Promise((r) => setTimeout(r, 4000))
-    const res = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    })
-    const d = await res.json()
-    if (d.status === "succeeded") {
-      const out = Array.isArray(d.output) ? d.output[0] : d.output
-      if (out) return out as string
-    }
-    if (d.status === "failed" || d.status === "canceled") throw new Error(d.error || "Failed")
-  }
-  throw new Error("Timed out")
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors })
 
@@ -31,6 +15,7 @@ serve(async (req) => {
     const body = await req.json()
     const { action } = body
 
+    // ── SELECT OUTFIT (Claude) ────────────────────────────────────
     if (action === "select_outfit") {
       const { wardrobeItems, style, personPhotoUrl } = body
       const styleGuides: Record<string, string> = {
@@ -50,7 +35,7 @@ serve(async (req) => {
 STYLE: ${style} — ${styleGuides[style] ?? style}
 WARDROBE: ${JSON.stringify(wardrobeItems.map((i: Record<string,unknown>) => ({ id:i.id, name:i.name, category:i.category, colors:i.colors, description:i.description })))}
 Pick: 1 top OR dress, 1 bottom (unless dress), shoes if available.
-Write image_prompt: vivid outfit description for AI image generation (colours, fabrics, silhouette).
+Write image_prompt: vivid outfit description for AI image generation (colours, fabrics, silhouette, styling details).
 Respond ONLY valid JSON no backticks:
 {"outfit_name":"","tagline":"","selected_items":[{"id":"","name":"","category":"","image_url":null,"styling_note":""}],"color_story":"","image_prompt":"","stylist_note":""}`,
       }]
@@ -77,6 +62,7 @@ Respond ONLY valid JSON no backticks:
       return new Response(JSON.stringify(outfit), { headers: { ...cors, "Content-Type": "application/json" } })
     }
 
+    // ── START TRY-ON (Flux Kontext Pro) — returns prediction_id immediately ──
     if (action === "tryon") {
       if (!REPLICATE_KEY) throw new Error("REPLICATE_API_KEY not configured")
       const { personImageUrl, imagePrompt } = body
@@ -88,10 +74,13 @@ Respond ONLY valid JSON no backticks:
       })
       const pred = await r.json()
       if (pred.error) throw new Error(pred.error)
-      const url = await pollReplicate(pred.id, REPLICATE_KEY)
-      return new Response(JSON.stringify({ result_url: url }), { headers: { ...cors, "Content-Type": "application/json" } })
+      // Return immediately — frontend polls
+      return new Response(JSON.stringify({ prediction_id: pred.id, status: pred.status }), {
+        headers: { ...cors, "Content-Type": "application/json" }
+      })
     }
 
+    // ── START GENERATE LOOK (Flux 1.1 Pro) — returns prediction_id immediately ──
     if (action === "generate_look") {
       if (!REPLICATE_KEY) throw new Error("REPLICATE_API_KEY not configured")
       const { imagePrompt } = body
@@ -103,13 +92,33 @@ Respond ONLY valid JSON no backticks:
       })
       const pred = await r.json()
       if (pred.error) throw new Error(pred.error)
-      const url = await pollReplicate(pred.id, REPLICATE_KEY)
-      return new Response(JSON.stringify({ result_url: url }), { headers: { ...cors, "Content-Type": "application/json" } })
+      // Return immediately — frontend polls
+      return new Response(JSON.stringify({ prediction_id: pred.id, status: pred.status }), {
+        headers: { ...cors, "Content-Type": "application/json" }
+      })
+    }
+
+    // ── POLL prediction status ────────────────────────────────────
+    if (action === "poll") {
+      if (!REPLICATE_KEY) throw new Error("REPLICATE_API_KEY not configured")
+      const { prediction_id } = body
+      const r = await fetch(`https://api.replicate.com/v1/predictions/${prediction_id}`, {
+        headers: { Authorization: `Bearer ${REPLICATE_KEY}` },
+      })
+      const d = await r.json()
+      const out = Array.isArray(d.output) ? d.output[0] : d.output
+      return new Response(JSON.stringify({
+        status: d.status,
+        result_url: d.status === "succeeded" ? out : null,
+        error: d.error ?? null,
+      }), { headers: { ...cors, "Content-Type": "application/json" } })
     }
 
     throw new Error("Unknown action")
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error"
-    return new Response(JSON.stringify({ error: msg }), { headers: { ...cors, "Content-Type": "application/json" }, status: 500 })
+    return new Response(JSON.stringify({ error: msg }), {
+      headers: { ...cors, "Content-Type": "application/json" }, status: 500,
+    })
   }
 })

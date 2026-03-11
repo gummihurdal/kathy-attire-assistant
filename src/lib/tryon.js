@@ -16,19 +16,33 @@ async function callEdge(action, payload) {
   return data
 }
 
-// Step 1: Claude selects outfit and writes image prompt
+// Poll until prediction completes
+async function pollUntilDone(predictionId, onProgress) {
+  for (let i = 0; i < 60; i++) {
+    await new Promise(r => setTimeout(r, 4000))
+    const result = await callEdge('poll', { prediction_id: predictionId })
+    if (onProgress) onProgress(i, result.status)
+    if (result.status === 'succeeded' && result.result_url) return result.result_url
+    if (result.status === 'failed') throw new Error(result.error || 'Generation failed')
+  }
+  throw new Error('Timed out after 4 minutes')
+}
+
+// Step 1: Claude selects outfit
 export async function selectOutfitForStyle({ wardrobeItems, style, personPhotoUrl }) {
   return callEdge('select_outfit', { wardrobeItems, style, personPhotoUrl })
 }
 
-// Step 2a: Flux Kontext Pro — redress the actual photo of Katherina
-export async function runVirtualTryOn({ personImageUrl, imagePrompt, styleName }) {
-  return callEdge('tryon', { personImageUrl, imagePrompt, styleName })
+// Step 2a: Flux Kontext Pro — redress person's actual photo
+export async function runVirtualTryOn({ personImageUrl, imagePrompt, styleName }, onProgress) {
+  const { prediction_id } = await callEdge('tryon', { personImageUrl, imagePrompt, styleName })
+  return pollUntilDone(prediction_id, onProgress)
 }
 
-// Step 2b: Flux 1.1 Pro — full fashion image when no person photo
-export async function generateLookImage({ imagePrompt, styleName }) {
-  return callEdge('generate_look', { imagePrompt, styleName })
+// Step 2b: Flux 1.1 Pro — generate fashion look (no person photo)
+export async function generateLookImage({ imagePrompt, styleName }, onProgress) {
+  const { prediction_id } = await callEdge('generate_look', { imagePrompt, styleName })
+  return pollUntilDone(prediction_id, onProgress)
 }
 
 export const STYLES = [
