@@ -71,7 +71,7 @@ Generate 6 outfit suggestions across: School, Weekend, Sport, Party, Cosy Day, D
           "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-5",  // ← Sonnet: 3-5x faster than Opus
+          model: "claude-haiku-4-5-20251001",  // ← Sonnet: 3-5x faster than Opus
           max_tokens: 2000,            // ← reduced from 3000
           system: systemPrompt,
           messages: [{ role: "user", content }]
