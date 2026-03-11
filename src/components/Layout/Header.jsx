@@ -180,7 +180,7 @@ const S = {
   },
   overlayLink: {
     textDecoration: 'none',
-    padding: '1rem 1rem 1rem 0.5rem',
+    padding: '1rem 1rem 1rem 1.5rem',
     fontSize: '1.1rem',
     letterSpacing: '0.12em',
     textTransform: 'uppercase',
