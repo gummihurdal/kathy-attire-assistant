@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Wardrobe from './pages/Wardrobe'
 import Outfits from './pages/Outfits'
 import Lookbook from './pages/Lookbook'
+import Advisor from './pages/Advisor'
 import Mirror from './pages/Mirror'
 import Auth from './pages/Auth'
 import './styles/globals.css'
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="/wardrobe" element={<Wardrobe />} />
               <Route path="/outfits" element={<Outfits />} />
               <Route path="/lookbook" element={<Lookbook />} />
+          <Route path="/advisor" element={<Advisor />} />
               <Route path="/mirror" element={<Mirror />} />
               <Route path="/auth" element={<Auth />} />
             </Routes>
