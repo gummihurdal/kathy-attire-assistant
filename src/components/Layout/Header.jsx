@@ -130,7 +130,7 @@ export default function Header() {
                 <button onClick={handleSignOut} style={S.overlaySignOut}>Sign Out</button>
               </>
             ) : (
-              <Link to="/auth" style={S.overlayLink} onClick={() => setMobileOpen(false)}>Sign In</Link>
+              <Link to="/auth" style={{...S.overlayLink, color: 'var(--gold)'}} onClick={() => setMobileOpen(false)}>Sign In</Link>
             )}
           </div>
         </div>
