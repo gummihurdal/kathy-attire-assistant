@@ -142,3 +142,22 @@ input::placeholder, textarea::placeholder { color: var(--ivory-faint); }
   font-size: 0.875rem !important;
   border-radius: 0 !important;
 }
+
+/* ── Header responsive ── */
+.header-nav,
+.header-auth { display: flex; }
+.header-mobile-btn { display: none; }
+
+@media (max-width: 768px) {
+  .header-nav  { display: none; }
+  .header-auth { display: none; }
+  .header-mobile-btn { display: flex; }
+  .header-inner { padding: 0.875rem 1.25rem !important; }
+}
+
+/* Prevent body scroll when mobile menu is open */
+body.menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
