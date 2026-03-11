@@ -1,10 +1,62 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { analyseWardrobe, OCCASION_ICONS, OCCASION_COLORS } from '../lib/styleAdvisor'
 import { getWardrobeItems } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 
 const OCCASION_FILTERS = ['All', 'School', 'Weekend', 'Sport', 'Party', 'Cosy Day', 'Date', 'Evening Out']
+
+
+const LOADING_STEPS = [
+  { icon: '👗', text: 'Cataloguing your pieces…', ms: 0 },
+  { icon: '🎨', text: 'Analysing your colour palette…', ms: 3500 },
+  { icon: '✦', text: 'Finding the best combinations…', ms: 8000 },
+  { icon: '📅', text: 'Matching outfits to occasions…', ms: 13000 },
+  { icon: '♛', text: 'Writing your style report…', ms: 18000 },
+]
+
+function AdvisorLoading() {
+  const [step, setStep] = useState(0)
+  useEffect(() => {
+    const timers = LOADING_STEPS.slice(1).map((s, i) =>
+      setTimeout(() => setStep(i + 1), s.ms)
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [])
+  const current = LOADING_STEPS[step]
+  return (
+    <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        style={{ fontSize: '3rem', display: 'inline-block', marginBottom: '2rem' }}>✦</motion.div>
+      <AnimatePresence mode="wait">
+        <motion.p key={step}
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.4 }}
+          style={{ color: 'var(--ivory)', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+          {current.icon} {current.text}
+        </motion.p>
+      </AnimatePresence>
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+        {LOADING_STEPS.map((s, i) => (
+          <motion.div key={i}
+            animate={{ background: i <= step ? 'var(--gold)' : 'rgba(255,255,255,0.1)', scale: i === step ? 1.3 : 1 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: 8, height: 8, borderRadius: '50%' }} />
+        ))}
+      </div>
+      <div style={{ width: 200, height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 auto', position: 'relative', overflow: 'hidden' }}>
+        <motion.div
+          animate={{ width: `${((step + 1) / LOADING_STEPS.length) * 100}%` }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          style={{ height: '100%', background: 'linear-gradient(90deg, var(--gold-dark), var(--gold))', position: 'absolute', left: 0 }} />
+      </div>
+      <p style={{ color: 'var(--stone)', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', marginTop: '1.25rem', letterSpacing: '0.08em' }}>
+        This takes about 20–30 seconds
+      </p>
+    </motion.div>
+  )
+}
 
 export default function Advisor() {
   const { user } = useAuth()
@@ -78,19 +130,7 @@ export default function Advisor() {
           )}
 
           {/* Loading */}
-          {phase === 'loading' && (
-            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              style={{ textAlign: 'center', padding: '5rem 2rem' }}>
-              <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                style={{ fontSize: '3rem', display: 'inline-block', marginBottom: '2rem' }}>✦</motion.div>
-              <p style={{ color: 'var(--ivory)', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-                Kat is studying your wardrobe…
-              </p>
-              <p style={{ color: 'var(--stone)', fontFamily: 'Jost, sans-serif', fontSize: '0.85rem' }}>
-                Analysing colours, combinations & occasions
-              </p>
-            </motion.div>
-          )}
+          {phase === 'loading' && <AdvisorLoading />}
 
           {/* Results */}
           {phase === 'done' && analysis && (
