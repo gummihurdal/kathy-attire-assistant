@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
-import { Camera, Sparkles, Loader, Trash2, Star, Download, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { Camera, Sparkles, Loader, Trash2, Star, Download, ChevronLeft, ChevronRight, Plus, Share2 } from 'lucide-react'
+import { exportStoryCard } from '../lib/storyExport'
 import toast from 'react-hot-toast'
 import { useAuth } from '../lib/auth'
 import {
@@ -21,6 +22,7 @@ export default function Mirror() {
   const [result, setResult] = useState(null)
   const [outfit, setOutfit] = useState(null)
   const [savedResults, setSavedResults] = useState([])
+  const [exporting, setExporting] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
@@ -390,11 +392,17 @@ export default function Mirror() {
                 <div style={{ ...styles.styleBadge, borderColor: activeStyleObj?.color, color: activeStyleObj?.color }}>
                   {activeStyleObj?.icon} {activeStyleObj?.label}
                 </div>
-                {/* Download */}
-                <a href={result} download={`kathy-${activeStyle}.jpg`} target="_blank" rel="noreferrer" style={styles.downloadBtn}>
-                  <Download size={13} strokeWidth={1.5} />
-                  Save Look
-                </a>
+                {/* Action buttons */}
+                <div style={{ display: 'flex', gap: '0.5rem', position: 'absolute', bottom: '1rem', right: '1rem', left: '1rem', justifyContent: 'flex-end' }}>
+                  <a href={result} download={`kathy-${activeStyle}.jpg`} target="_blank" rel="noreferrer" style={{ ...styles.downloadBtn, position: 'relative', bottom: 'auto', right: 'auto' }}>
+                    <Download size={13} strokeWidth={1.5} />
+                    Save
+                  </a>
+                  <button onClick={handleExportStory} disabled={exporting} style={{ ...styles.downloadBtn, position: 'relative', bottom: 'auto', right: 'auto', background: 'rgba(201,168,76,0.2)', border: '1px solid var(--gold)', color: 'var(--gold)', cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+                    {exporting ? <Loader size={13} strokeWidth={1.5} style={{ animation: 'spin 1s linear infinite' }} /> : <Share2 size={13} strokeWidth={1.5} />}
+                    {exporting ? 'Creating…' : 'Story Card'}
+                  </button>
+                </div>
               </motion.div>
             ) : (
               <motion.div
