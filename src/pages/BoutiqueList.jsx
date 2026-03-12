@@ -14,6 +14,7 @@ const SIZE_OPTIONS = {
   Accessories: ['One Size','XS/S','M/L'],
   Jewellery:   ['One Size','Ring size 48','Ring size 50','Ring size 52','Ring size 54','Ring size 56','Ring size 58'],
   Scarves:     ['One Size','Small','Large'],
+  Other:       ['One Size', 'XS', 'S', 'M', 'L', 'XL', 'N/A'],
   default:     ['XXS','XS','S','M','L','XL','XXL','34','36','38','40','42','44','46','48','One Size'],
 }
 

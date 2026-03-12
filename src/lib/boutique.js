@@ -69,5 +69,5 @@ export const CONDITIONS = [
 ]
 
 export const CATEGORIES = [
-  'Bags', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Jewellery', 'Scarves'
+  'Bags', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Jewellery', 'Scarves', 'Other'
 ]
