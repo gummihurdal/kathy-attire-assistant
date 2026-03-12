@@ -251,7 +251,7 @@ export default function Advisor() {
 
                             {/* Confidence */}
                             <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                              <div style={{ color: 'var(--gold)', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem' }}>{outfit.confidence}%</div>
+                              <div style={{ color: 'var(--gold)', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem' }}>{outfit.confidence || outfit.confidence_score || "–"}%</div>
                               <div style={{ color: 'var(--stone)', fontFamily: 'Jost', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>match</div>
                             </div>
 
@@ -274,7 +274,7 @@ export default function Advisor() {
                                           <div key={item.id} style={{ textAlign: 'center', width: 80 }}>
                                             <div style={{ width: 80, height: 80, borderRadius: 8, overflow: 'hidden', background: 'var(--obsidian)', marginBottom: '0.35rem', border: '1px solid rgba(255,255,255,0.1)' }}>
                                               {item.image_url && !item.image_url.startsWith('data:') ? (
-                                                <img src={item.image_url} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img src={item?.image_url || ''} alt={item?.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none' }} />
                                               ) : (
                                                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--stone)', fontSize: '1.5rem' }}>👕</div>
                                               )}

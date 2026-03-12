@@ -35,7 +35,7 @@ export default function Outfits() {
   const loadWardrobe = async () => {
     setLoading(true)
     try {
-      const data = user ? await getWardrobeItems(user.id) : DEMO_ITEMS
+      const data = await getWardrobeItems(user?.id || "demo")
       setWardrobeItems(data)
     } catch {
       setWardrobeItems(DEMO_ITEMS)
