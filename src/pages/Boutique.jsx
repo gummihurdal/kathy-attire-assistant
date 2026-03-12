@@ -91,7 +91,7 @@ function ListingCard({ listing }) {
               }}
             >
               <ShoppingBag size={11} strokeWidth={1.5} />
-              {inCart ? 'In Cart' : 'Add'}
+              {inCart ? 'In Cart' : 'Add to Cart'}
             </button>
           </div>
           {listing.size && (
