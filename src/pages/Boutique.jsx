@@ -5,7 +5,7 @@ import { getListings, CATEGORIES, BRANDS } from '../lib/boutique'
 import { useCart } from '../lib/cart'
 import { ShoppingBag, Plus } from 'lucide-react'
 import { useAuth } from '../lib/auth'
-
+import toast from 'react-hot-toast'
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.07 } } }
 
@@ -79,7 +79,7 @@ function ListingCard({ listing }) {
               €{Number(listing.price).toLocaleString('de-DE', { minimumFractionDigits: 0 })}
             </p>
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!user) { navigate('/auth'); return } add(listing) }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!user) { navigate('/auth'); return } if (!inCart) { add(listing); toast.success(`${listing.title} added to cart`, { className: 'toast-royal' }) } }}
               style={{
                 background: inCart ? 'rgba(201,168,76,0.15)' : 'transparent',
                 border: `1px solid ${inCart ? 'rgba(201,168,76,0.6)' : 'rgba(201,168,76,0.5)'}`,

@@ -20,7 +20,6 @@ export function CartProvider({ children }) {
       if (exists) return prev
       return [...prev, { ...listing, qty: 1 }]
     })
-    setOpen(true)
   }
 
   const remove = (id) => setItems(prev => prev.filter(i => i.id !== id))
