@@ -59,7 +59,7 @@ export default function BoutiqueItem() {
         Boutique
       </Link>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'start' }}>
+      <div className="boutique-item-grid">
         {/* Left — Image gallery */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
           {/* Main image */}
@@ -78,14 +78,16 @@ export default function BoutiqueItem() {
             )}
 
             {/* Exclusive badge */}
-            <div style={{
-              position: 'absolute', top: '1rem', left: '1rem',
-              background: 'rgba(8,8,8,0.88)', border: '1px solid rgba(201,168,76,0.35)',
-              padding: '0.25rem 0.75rem',
-              fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)',
-            }}>
-              ♛ Exclusive
-            </div>
+            {listing.is_exclusive && (
+              <div style={{
+                position: 'absolute', bottom: '0.75rem', left: '0.75rem',
+                background: 'rgba(8,8,8,0.82)', border: '1px solid rgba(201,168,76,0.35)',
+                padding: '0.2rem 0.55rem',
+                fontSize: '0.52rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--gold)',
+              }}>
+                ♛ Exclusive
+              </div>
+            )}
           </div>
 
           {/* Thumbnails */}
@@ -202,12 +204,17 @@ export default function BoutiqueItem() {
         </motion.div>
       </div>
 
-      {/* Mobile */}
       <style>{`
+        .boutique-item-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          align-items: start;
+        }
         @media (max-width: 768px) {
-          div[style*="gridTemplateColumns: '1fr 1fr'"][style*="gap: '5rem'"] {
-            grid-template-columns: 1fr !important;
-            gap: 2rem !important;
+          .boutique-item-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
           }
         }
       `}</style>
