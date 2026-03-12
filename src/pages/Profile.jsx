@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { useAuth } from '../lib/auth'
+
+const ADMIN_EMAILS = ['gudmundur.brekkan@snb.ch', 'gummihurdal@gmail.com', 'brekkan@gmail.com']
 
 const BODY_SHAPES = [
   {
@@ -75,6 +79,7 @@ export function getStyleProfile() {
 }
 
 export default function Profile() {
+  const { user } = useAuth()
   const [profile, setProfile] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null') || {} } catch { return {} }
   })
@@ -107,6 +112,11 @@ export default function Profile() {
         <p className="section-label">Personal Style</p>
         <h1 style={P.title}>Style Profile</h1>
         <span className="gold-line" />
+        {user && ADMIN_EMAILS.includes(user.email) && (
+          <Link to="/admin" style={{ display: 'inline-block', marginTop: '1rem', fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', textDecoration: 'none', border: '1px solid var(--gold-dark)', padding: '0.35rem 0.875rem' }}>
+            ♛ Admin Dashboard
+          </Link>
+        )}
         <p style={P.subtitle}>
           Tell Kat about your body — every outfit recommendation will be tailored to flatter you.
         </p>

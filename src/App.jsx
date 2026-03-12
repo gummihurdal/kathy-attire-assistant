@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useEffect } from 'react'
 import { AuthProvider } from './lib/auth'
 import { CartProvider } from './lib/cart'
 import Header from './components/Layout/Header'
@@ -16,13 +17,22 @@ import Boutique from './pages/Boutique'
 import BoutiqueList from './pages/BoutiqueList'
 import BoutiqueItem from './pages/BoutiqueItem'
 import Messages from './pages/Messages'
+import Admin from './pages/Admin'
+import { trackPageView } from './lib/analytics'
 import './styles/globals.css'
+
+function PageTracker() {
+  const location = useLocation()
+  useEffect(() => { trackPageView(location.pathname) }, [location.pathname])
+  return null
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
       <CartProvider>
+        <PageTracker />
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <Header />
           <CartDrawer />
@@ -40,6 +50,7 @@ export default function App() {
               <Route path="/boutique/sell" element={<BoutiqueList />} />
               <Route path="/boutique/:id" element={<BoutiqueItem />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/admin" element={<Admin />} />
             </Routes>
           </main>
           <footer style={styles.footer}>
