@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getListings, CATEGORIES, BRANDS } from '../lib/boutique'
 import { useCart } from '../lib/cart'
@@ -63,7 +63,7 @@ function ListingCard({ listing }) {
             }}
           >
             <button
-              onClick={(e) => { e.preventDefault(); add(listing) }}
+              onClick={(e) => { e.preventDefault(); if (!user) { navigate('/auth'); return } add(listing) }}
               style={{
                 background: 'var(--gold)', border: 'none', color: 'var(--obsidian)',
                 padding: '0.6rem 1.1rem', fontSize: '0.65rem', letterSpacing: '0.14em',
@@ -123,6 +123,7 @@ function ListingCard({ listing }) {
 
 export default function Boutique() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')

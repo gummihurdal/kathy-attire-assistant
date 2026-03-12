@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getListing } from '../lib/boutique'
 import { useCart } from '../lib/cart'
+import { useAuth } from '../lib/auth'
 import { ShoppingBag, ArrowLeft, Shield, Truck, RefreshCw } from 'lucide-react'
 
 const CONDITION_LABELS = {
@@ -16,6 +17,8 @@ const CONDITION_LABELS = {
 export default function BoutiqueItem() {
   const { id } = useParams()
   const { add, items } = useCart()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeImg, setActiveImg] = useState(0)
@@ -30,6 +33,7 @@ export default function BoutiqueItem() {
   }, [items, listing])
 
   const handleAdd = () => {
+    if (!user) { navigate('/auth'); return }
     add(listing)
     setAdded(true)
   }
