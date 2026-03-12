@@ -72,7 +72,7 @@ function ListingCard({ listing }) {
               }}
             >
               <ShoppingBag size={12} strokeWidth={2} />
-              Reserve
+              Add to Cart
             </button>
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.3rem',

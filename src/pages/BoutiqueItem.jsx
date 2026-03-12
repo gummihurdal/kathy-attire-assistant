@@ -197,7 +197,7 @@ export default function BoutiqueItem() {
             }}
           >
             <ShoppingBag size={15} strokeWidth={1.5} />
-            {added ? 'Added to Selection' : 'Reserve This Piece'}
+            {added ? 'In Your Cart' : 'Add to Cart'}
           </button>
 
           {/* Escrow notice */}
