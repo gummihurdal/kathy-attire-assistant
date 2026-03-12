@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getListings, CATEGORIES, BRANDS } from '../lib/boutique'
 import { useCart } from '../lib/cart'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, Plus } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }
