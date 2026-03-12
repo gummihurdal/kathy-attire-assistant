@@ -106,6 +106,11 @@ export default function Home() {
                 Generate an Outfit
               </Link>
             )}
+            {user && (
+              <Link to="/advisor" style={styles.ctaSecondary}>
+                Style Advisor
+              </Link>
+            )}
           </motion.div>
         </motion.div>
       </section>

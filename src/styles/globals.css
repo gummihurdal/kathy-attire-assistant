@@ -11,6 +11,7 @@
   --gold-light: #e8c96a;
   --gold-dark: #9a7a2e;
   --gold-glow: rgba(201, 168, 76, 0.12);
+  --stone: #6b6560;
   --crimson: #8b1a1a;
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Jost', system-ui, sans-serif;
@@ -124,6 +125,22 @@ input::placeholder, textarea::placeholder { color: var(--ivory-faint); }
   text-transform: uppercase; color: var(--gold);
   font-weight: 500; font-family: var(--font-body);
 }
+
+.btn-royal {
+  background: var(--gold);
+  color: var(--obsidian);
+  border: none;
+  padding: 0.875rem 2rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.2s, opacity 0.2s;
+}
+.btn-royal:hover { background: var(--gold-light); }
+.btn-royal:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Responsive */
 @media (max-width: 768px) {
