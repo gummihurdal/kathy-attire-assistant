@@ -11,6 +11,74 @@ import {
 } from '../lib/supabase'
 import { selectOutfitForStyle, runFullTryOn, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
 
+const HAIR_TIPS = {
+  sporty: {
+    headline: 'Keep it out of the way — but make it cute',
+    looks: [
+      { name: 'High Ponytail', tip: 'Sleek or slightly messy — instant sporty energy' },
+      { name: 'Space Buns', tip: 'Fun, youthful, stays put during movement' },
+      { name: 'Sporty Braid', tip: 'Dutch braid or boxer braids — zero fuss, all style' },
+    ],
+    avoid: 'Loose blow-dried hair — it clashes with the athletic vibe',
+  },
+  casual: {
+    headline: 'Effortless is the goal — undone is perfect',
+    looks: [
+      { name: 'Messy Bun', tip: 'Pull a few strands out — intentionally imperfect' },
+      { name: 'Half-Up Claw Clip', tip: '90s comeback, works with everything casual' },
+      { name: 'Loose Waves', tip: 'Air-dry or quick diffuse — relaxed and natural' },
+    ],
+    avoid: 'Overly structured or stiff styles — too formal for the vibe',
+  },
+  smart_casual: {
+    headline: 'Polished but relaxed — put-together without trying too hard',
+    looks: [
+      { name: 'Sleek Low Pony', tip: 'Clean and chic — elevates any smart casual outfit' },
+      { name: 'Soft Waves', tip: 'Bouncy, defined waves — classic and versatile' },
+      { name: 'French Tuck Updo', tip: 'Loose chignon with a few face-framing pieces' },
+    ],
+    avoid: 'Very messy styles — undercuts the polished look',
+  },
+  business: {
+    headline: 'Neat, intentional, professional',
+    looks: [
+      { name: 'Blowout', tip: 'Smooth and voluminous — ultimate professional confidence' },
+      { name: 'Low Chignon', tip: 'Elegant and timeless for formal settings' },
+      { name: 'Sleek Straight', tip: 'Flat-ironed with shine spray — sharp and modern' },
+    ],
+    avoid: 'Messy buns or undone styles — save for weekends',
+  },
+  evening: {
+    headline: 'Make a statement — this is your moment',
+    looks: [
+      { name: 'Glam Waves', tip: 'Old Hollywood curls — instantly dressy' },
+      { name: 'Elegant Updo', tip: 'Twisted or pinned up — shows off your outfit and neckline' },
+      { name: 'Sleek High Pony', tip: 'Dramatic and modern — with a few face-framing pieces' },
+    ],
+    avoid: 'Flat, unstyled hair — the outfit deserves more',
+  },
+  formal: {
+    headline: 'Flawless — every detail counts',
+    looks: [
+      { name: 'Classic Updo', tip: 'Braided, twisted or pinned — timeless elegance' },
+      { name: 'Old Hollywood Waves', tip: 'Set curls or hot rollers — utterly glamorous' },
+      { name: 'Sculptural Bun', tip: 'Sleek and structured — modern and sophisticated' },
+    ],
+    avoid: 'Anything undone or overly casual',
+  },
+  weekend: {
+    headline: 'Low effort, high style',
+    looks: [
+      { name: 'Claw Clip Updo', tip: 'Throw it up and go — effortlessly cute' },
+      { name: 'Braided Pigtails', tip: 'Playful and practical for a relaxed day out' },
+      { name: 'Natural Air-Dry', tip: 'Embrace your texture — add a headband if needed' },
+    ],
+    avoid: 'Anything that takes more than 5 minutes',
+  },
+}
+
+
+
 export default function Mirror() {
   const { user } = useAuth()
   const [photos, setPhotos] = useState([])
@@ -430,6 +498,26 @@ export default function Mirror() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* ── Hair Suggestions ── */}
+      {result && HAIR_TIPS[activeStyle] && (() => {
+        const h = HAIR_TIPS[activeStyle]
+        return (
+          <div style={{ padding: '2rem clamp(1rem, 4vw, 3rem)', borderTop: '1px solid var(--border)' }}>
+            <p className="section-label" style={{ marginBottom: '0.4rem' }}>Hair Suggestion</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--ivory)', marginBottom: '1.25rem' }}>{h.headline}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1px', background: 'var(--border)', marginBottom: '1rem' }}>
+              {h.looks.map(look => (
+                <div key={look.name} style={{ background: 'var(--charcoal)', padding: '1rem' }}>
+                  <p style={{ fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.35rem' }}>✦ {look.name}</p>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--ivory-faint)', fontWeight: 300, lineHeight: 1.5 }}>{look.tip}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: '0.72rem', color: 'var(--stone)', fontStyle: 'italic' }}>◇ Avoid: {h.avoid}</p>
+          </div>
+        )
+      })()}
 
       {/* ── History strip ── */}
       <AnimatePresence>
