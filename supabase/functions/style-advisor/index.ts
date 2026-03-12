@@ -18,16 +18,9 @@ serve(async (req) => {
       has_photo: !!(i.image_url && !(i.image_url as string).startsWith("data:"))
     })))
 
-    // Max 6 images — fewer = faster
+    // Text-only analysis — image fetching adds 25s+ latency with no meaningful accuracy gain
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageBlocks: any[] = []
-    const withPhotos = (wardrobeItems as Record<string,unknown>[])
-      .filter(i => i.image_url && !(i.image_url as string).startsWith("data:"))
-      .slice(0, 6)
-    for (const item of withPhotos) {
-      imageBlocks.push({ type: "text", text: `[ID:${item.id}] ${item.name} (${item.category})` })
-      imageBlocks.push({ type: "image", source: { type: "url", url: item.image_url } })
-    }
 
     // Build body profile context
     let profileContext = ""
@@ -41,10 +34,10 @@ serve(async (req) => {
     }
 
     if (requestType === "full_analysis") {
-      const systemPrompt = `You are Kat, a personal stylist for Katherina, a teenage girl. Be friendly and encouraging. All suggestions must be age-appropriate. Reply ONLY with valid JSON — no markdown, no backticks.`
+      const systemPrompt = `You are Kat, Katherina's personal stylist. Be warm but brief. Age-appropriate only. Reply ONLY with compact valid JSON — no markdown, no backticks, no long explanations.`
 
       const userPrompt = `Wardrobe (${wardrobeItems.length} items): ${itemsSummary}${profileContext ? "\n\nKatherina's body profile:" + profileContext + "\nUse this to ensure every outfit flatters her shape and height. Respect the avoid list strictly." : ""}
-${imageBlocks.length > 0 ? `Photos attached for ${imageBlocks.length / 2} items.` : ""}
+
 
 Return this exact JSON structure:
 {
@@ -61,8 +54,8 @@ Return this exact JSON structure:
       "occasion": "School",
       "item_ids": ["uuid1", "uuid2"],
       "item_names": ["Name 1", "Name 2"],
-      "description": "Styling tip",
-      "why_it_works": "Reason",
+      "description": "Brief tip (max 15 words)",
+      "why_it_works": "Brief reason (max 10 words)",
       "confidence": 90
     }
   ],
@@ -83,7 +76,7 @@ Generate 6 outfit suggestions across: School, Weekend, Sport, Party, Cosy Day, D
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",  // faster than haiku for JSON-heavy tasks
-          max_tokens: 2000,            // ← reduced from 3000
+          max_tokens: 1200,            // ← reduced from 3000
           system: systemPrompt,
           messages: [{ role: "user", content }]
         }),
