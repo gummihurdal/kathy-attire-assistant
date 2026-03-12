@@ -202,6 +202,7 @@ const S = {
   inner: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '1rem 2.5rem', gap: '1.5rem',
+    maxWidth: 1600, margin: '0 auto', width: '100%',
   },
   brandLink: { display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none', flexShrink: 0 },
   brandName: { fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 500, color: 'var(--ivory)', fontStyle: 'italic', letterSpacing: '0.04em' },

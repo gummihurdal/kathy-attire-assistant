@@ -46,9 +46,9 @@ const BODY_SHAPES = [
 ]
 
 const HEIGHTS = [
-  { key: 'petite', label: 'Petite', sub: 'Under 163cm / 5\'4"' },
-  { key: 'average', label: 'Average', sub: '163–173cm / 5\'4"–5\'8"' },
-  { key: 'tall', label: 'Tall', sub: 'Over 173cm / 5\'8"' },
+  { key: 'petite', label: 'Petite', sub: 'Under 163 cm' },
+  { key: 'average', label: 'Average', sub: '163–173 cm' },
+  { key: 'tall', label: 'Tall', sub: 'Over 173 cm' },
 ]
 
 const EMPHASISE = [
@@ -153,12 +153,6 @@ export default function Profile() {
                   <p style={P.tipTitle}>✦ Works great for you</p>
                   {selectedShape.tips.map(t => (
                     <p key={t} style={P.tipItem}>— {t}</p>
-                  ))}
-                </div>
-                <div style={P.tipCol}>
-                  <p style={{ ...P.tipTitle, color: 'var(--ivory-faint)' }}>◇ Consider avoiding</p>
-                  {selectedShape.avoid.map(t => (
-                    <p key={t} style={{ ...P.tipItem, color: 'var(--ivory-faint)' }}>— {t}</p>
                   ))}
                 </div>
               </div>
@@ -268,7 +262,7 @@ const P = {
   shapeIcon: { fontSize: '1.8rem', display: 'block' },
   shapeLabel: { fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500 },
   shapeDesc: { fontSize: '0.65rem', color: 'var(--stone)', fontWeight: 300, lineHeight: 1.4 },
-  shapeTips: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--border)', marginTop: '1px' },
+  shapeTips: { display: 'grid', gridTemplateColumns: '1fr', gap: '1px', background: 'var(--border)', marginTop: '1px' },
   tipCol: { background: 'var(--charcoal)', padding: '1.25rem' },
   tipTitle: { fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.75rem' },
   tipItem: { fontSize: '0.8rem', color: 'var(--ivory-dim)', marginBottom: '0.35rem', fontWeight: 300 },

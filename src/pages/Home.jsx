@@ -170,6 +170,7 @@ const styles = {
     minHeight: '85vh',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   heroBg: {
     position: 'absolute',
@@ -187,7 +188,8 @@ const styles = {
     transform: 'translate(-50%, -50%)',
   },
   heroContent: {
-    maxWidth: 700,
+    maxWidth: 780,
+    width: '100%',
     position: 'relative',
     zIndex: 1,
   },
@@ -206,7 +208,7 @@ const styles = {
   },
   heroTitle: {
     fontFamily: 'var(--font-display)',
-    fontSize: 'clamp(3rem, 6vw, 5.5rem)',
+    fontSize: 'clamp(3rem, 5vw, 6.5rem)',
     fontWeight: 300,
     lineHeight: 1.1,
     letterSpacing: '-0.01em',
@@ -271,6 +273,8 @@ const styles = {
   },
   features: {
     padding: '6rem 4rem',
+    maxWidth: 1400,
+    margin: '0 auto',
   },
   featuresHeader: {
     maxWidth: 480,
