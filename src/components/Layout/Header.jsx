@@ -101,17 +101,12 @@ export default function Header() {
             )}
 
             {/* Cart icon — always visible */}
-            <button onClick={() => openCart(true)} style={{ ...S.iconBtn, position: 'relative' }} title="My Selection">
-              <ShoppingBag size={15} strokeWidth={1.5} />
+            <button onClick={() => openCart(true)} style={{ ...S.iconBtn, position: 'relative', width: 'auto', padding: '0 0.75rem', gap: '0.4rem', display: 'flex', alignItems: 'center', border: count > 0 ? '1px solid rgba(201,168,76,0.4)' : '1px solid var(--border)' }} title="View Cart">
+              <ShoppingBag size={15} strokeWidth={1.5} style={{ color: count > 0 ? 'var(--gold)' : 'var(--ivory-faint)', flexShrink: 0 }} />
               {count > 0 && (
-                <span style={{
-                  position: 'absolute', top: -5, right: -5,
-                  background: 'var(--gold)', color: 'var(--obsidian)',
-                  borderRadius: '50%', width: 15, height: 15,
-                  fontSize: '0.52rem', fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  lineHeight: 1, pointerEvents: 'none',
-                }}>{count > 9 ? '9+' : count}</span>
+                <span style={{ fontSize: '0.6rem', color: 'var(--gold)', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                  {count} {count === 1 ? 'item' : 'items'}
+                </span>
               )}
             </button>
 
@@ -169,7 +164,16 @@ export default function Header() {
 
             <div style={S.overlaySeparator} />
 
-            {user ? (
+            {/* Cart shortcut in mobile menu */}
+            <button
+              onClick={() => { setMobileOpen(false); openCart(true) }}
+              style={{ ...S.overlayLink, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', color: count > 0 ? 'var(--gold)' : 'var(--ivory-faint)', fontFamily: 'var(--font-body)', width: '100%' }}
+            >
+              <ShoppingBag size={14} strokeWidth={1.5} />
+              Cart{count > 0 ? ` · ${count} ${count === 1 ? 'item' : 'items'}` : ''}
+            </button>
+
+            <div style={S.overlaySeparator} />
               <>
                 <div style={S.overlayMeta}>{user.email}</div>
                 <button onClick={handleSignOut} style={S.overlaySignOut}>Sign Out</button>
