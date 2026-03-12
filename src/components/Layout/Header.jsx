@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
-import { LogOut, Crown, Menu, X } from 'lucide-react'
+import { useCart } from '../../lib/cart'
+import { LogOut, Crown, Menu, X, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const NAV = [
@@ -12,12 +13,14 @@ const NAV = [
   { path: '/lookbook', label: 'Lookbook' },
   { path: '/advisor',  label: 'Style Advisor' },
   { path: '/profile',  label: 'My Profile' },
+  { path: '/boutique', label: 'Boutique ♛' },
 ]
 
 export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const { count, setOpen: openCart } = useCart()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Lock body scroll when mobile menu open
@@ -72,7 +75,7 @@ export default function Header() {
           {/* Right side */}
           <div style={S.actions}>
             {/* Desktop user/signin — hidden on mobile */}
-            <div className="header-auth" style={{ alignItems: 'center', gap: '0.75rem' }}>
+            <div className="header-auth" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} style={{ alignItems: 'center', gap: '0.75rem' }}>
               {user ? (
                 <>
                   <span style={S.userEmail}>{user.email?.split('@')[0]}</span>

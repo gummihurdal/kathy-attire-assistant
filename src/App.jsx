@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './lib/auth'
+import { CartProvider } from './lib/cart'
 import Header from './components/Layout/Header'
+import CartDrawer from './components/Cart/CartDrawer'
 import Home from './pages/Home'
 import Wardrobe from './pages/Wardrobe'
 import Outfits from './pages/Outfits'
@@ -10,14 +12,19 @@ import Advisor from './pages/Advisor'
 import Mirror from './pages/Mirror'
 import Auth from './pages/Auth'
 import Profile from './pages/Profile'
+import Boutique from './pages/Boutique'
+import BoutiqueList from './pages/BoutiqueList'
+import BoutiqueItem from './pages/BoutiqueItem'
 import './styles/globals.css'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <CartProvider>
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <Header />
+          <CartDrawer />
           <main style={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -28,6 +35,9 @@ export default function App() {
               <Route path="/mirror" element={<Mirror />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/boutique" element={<Boutique />} />
+              <Route path="/boutique/sell" element={<BoutiqueList />} />
+              <Route path="/boutique/:id" element={<BoutiqueItem />} />
             </Routes>
           </main>
           <footer style={styles.footer}>
@@ -49,6 +59,7 @@ export default function App() {
             fontWeight: 300, borderRadius: '0',
           },
         }} />
+      </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   )
