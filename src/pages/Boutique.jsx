@@ -83,18 +83,7 @@ function ListingCard({ listing }) {
             </div>
           </motion.div>
 
-          {/* Exclusive badge */}
-          {listing.is_exclusive && (
-            <div style={{
-              position: 'absolute', top: '0.75rem', left: '0.75rem',
-              background: 'rgba(8,8,8,0.85)', border: '1px solid rgba(201,168,76,0.3)',
-              padding: '0.2rem 0.6rem',
-              fontSize: '0.55rem', letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: 'var(--gold)', fontFamily: 'var(--font-body)',
-            }}>
-              Exclusive
-            </div>
-          )}
+
 
           {/* Condition badge */}
           <div style={{

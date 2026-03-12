@@ -77,17 +77,7 @@ export default function BoutiqueItem() {
               </div>
             )}
 
-            {/* Exclusive badge */}
-            {listing.is_exclusive && (
-              <div style={{
-                position: 'absolute', bottom: '0.75rem', left: '0.75rem',
-                background: 'rgba(8,8,8,0.82)', border: '1px solid rgba(201,168,76,0.35)',
-                padding: '0.2rem 0.55rem',
-                fontSize: '0.52rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--gold)',
-              }}>
-                ♛ Exclusive
-              </div>
-            )}
+
           </div>
 
           {/* Thumbnails */}
