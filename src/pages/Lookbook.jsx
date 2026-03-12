@@ -41,7 +41,7 @@ export default function Lookbook() {
   const loadOutfits = async () => {
     setLoading(true)
     try {
-      const data = user ? await getSavedOutfits(user.id) : DEMO_OUTFITS
+      const data = await getSavedOutfits(user?.id || "demo")
       setOutfits(data)
     } catch {
       setOutfits(DEMO_OUTFITS)

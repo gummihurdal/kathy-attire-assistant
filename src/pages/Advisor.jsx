@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { analyseWardrobe, OCCASION_ICONS, OCCASION_COLORS } from '../lib/styleAdvisor'
 import { getWardrobeItems } from '../lib/supabase'
@@ -127,6 +128,11 @@ export default function Advisor() {
               <button onClick={runAnalysis} className="btn-royal" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
                 ✦ Analyse My Wardrobe
               </button>
+              <p style={{ marginTop: '1.5rem', color: 'var(--ivory-faint)', fontFamily: 'Jost, sans-serif', fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                For personalised advice,{' '}
+                <Link to="/profile" style={{ color: 'var(--gold)', textDecoration: 'underline' }}>set your body profile</Link>
+                {' '}first.
+              </p>
             </motion.div>
           )}
 
