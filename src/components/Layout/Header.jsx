@@ -74,8 +74,23 @@ export default function Header() {
 
           {/* Right side */}
           <div style={S.actions}>
+            {/* Cart icon — always visible */}
+            <button onClick={() => openCart(true)} style={{ ...S.iconBtn, position: 'relative' }} title="My Selection">
+              <ShoppingBag size={15} strokeWidth={1.5} />
+              {count > 0 && (
+                <span style={{
+                  position: 'absolute', top: -5, right: -5,
+                  background: 'var(--gold)', color: 'var(--obsidian)',
+                  borderRadius: '50%', width: 15, height: 15,
+                  fontSize: '0.52rem', fontWeight: 700,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  lineHeight: 1, pointerEvents: 'none',
+                }}>{count > 9 ? '9+' : count}</span>
+              )}
+            </button>
+
             {/* Desktop user/signin — hidden on mobile */}
-            <div className="header-auth" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} style={{ alignItems: 'center', gap: '0.75rem' }}>
+            <div className="header-auth" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               {user ? (
                 <>
                   <span style={S.userEmail}>{user.email?.split('@')[0]}</span>

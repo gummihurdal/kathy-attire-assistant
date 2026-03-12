@@ -39,8 +39,13 @@ export async function deleteListing(id) {
   if (error) throw error
 }
 
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+
 export async function uploadListingImage(file, sellerId) {
-  const ext = file.name.split('.').pop()
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error('Only JPG, PNG and WebP images are accepted')
+  }
+  const ext = file.type.split('/')[1].replace('jpeg', 'jpg')
   const path = `listings/${sellerId}/${Date.now()}.${ext}`
   const { error } = await supabase.storage.from('wardrobe').upload(path, file, { upsert: false })
   if (error) throw error

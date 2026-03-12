@@ -62,6 +62,9 @@ export default function BoutiqueList() {
     if (!form.title || !form.brand || !form.category || !form.condition || !form.price) {
       toast.error('Please fill in all required fields', { className: 'toast-royal' }); return
     }
+    if (parseFloat(form.price) <= 0 || isNaN(parseFloat(form.price))) {
+      toast.error('Please enter a valid price greater than zero', { className: 'toast-royal' }); return
+    }
     if (images.length === 0) {
       toast.error('Please add at least one image', { className: 'toast-royal' }); return
     }
@@ -116,7 +119,7 @@ export default function BoutiqueList() {
                       Cover
                     </div>
                   )}
-                  <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))}
+                  <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} aria-label={`Remove image ${i+1}`}
                     style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(8,8,8,0.85)', border: 'none', cursor: 'pointer', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ivory)' }}>
                     <X size={11} strokeWidth={2} />
                   </button>

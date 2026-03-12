@@ -81,7 +81,7 @@ export default function CartDrawer() {
                           €{Number(item.price).toLocaleString('de-DE', { minimumFractionDigits: 0 })}
                         </p>
                       </div>
-                      <button onClick={() => remove(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ivory-faint)', padding: '0.25rem', flexShrink: 0 }}>
+                      <button onClick={() => remove(item.id)} aria-label={`Remove ${item.title}`} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ivory-faint)', padding: '0.25rem', flexShrink: 0 }}>
                         <Trash2 size={15} strokeWidth={1.2} />
                       </button>
                     </motion.div>
