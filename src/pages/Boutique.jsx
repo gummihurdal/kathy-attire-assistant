@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getListings, CATEGORIES, BRANDS } from '../lib/boutique'
 import { useCart } from '../lib/cart'
-import { ShoppingBag, Eye, Plus } from 'lucide-react'
+import { ShoppingBag } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }
@@ -18,8 +18,11 @@ const CONDITION_LABELS = {
 }
 
 function ListingCard({ listing }) {
-  const { add } = useCart()
+  const { add, items } = useCart()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [hovered, setHovered] = useState(false)
+  const inCart = items.some(i => i.id === listing.id)
 
   return (
     <motion.div variants={fadeUp}
@@ -51,40 +54,6 @@ function ListingCard({ listing }) {
             </div>
           )}
 
-          {/* Overlay on hover */}
-          <motion.div
-            animate={{ opacity: hovered ? 1 : 0 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(to top, rgba(8,8,8,0.8) 0%, transparent 50%)',
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-              padding: '1rem',
-            }}
-          >
-            <button
-              onClick={(e) => { e.preventDefault(); if (!user) { navigate('/auth'); return } add(listing) }}
-              style={{
-                background: 'var(--gold)', border: 'none', color: 'var(--obsidian)',
-                padding: '0.6rem 1.1rem', fontSize: '0.65rem', letterSpacing: '0.14em',
-                textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 500,
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem',
-              }}
-            >
-              <ShoppingBag size={12} strokeWidth={2} />
-              Add to Cart
-            </button>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '0.3rem',
-              fontSize: '0.65rem', color: 'rgba(245,240,232,0.6)', letterSpacing: '0.08em',
-            }}>
-              <Eye size={11} strokeWidth={1.5} />
-              {listing.views || 0}
-            </div>
-          </motion.div>
-
-
-
           {/* Condition badge */}
           <div style={{
             position: 'absolute', top: '0.75rem', right: '0.75rem',
@@ -102,19 +71,34 @@ function ListingCard({ listing }) {
           <p style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.25rem' }}>
             {listing.brand}
           </p>
-          <p style={{ fontFamily: 'var(--font-display)', color: 'var(--ivory)', fontSize: '1.05rem', fontWeight: 400, letterSpacing: '0.01em', lineHeight: 1.3, marginBottom: '0.4rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', color: 'var(--ivory)', fontSize: '1.05rem', fontWeight: 400, letterSpacing: '0.01em', lineHeight: 1.3, marginBottom: '0.6rem' }}>
             {listing.title}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <p style={{ fontFamily: 'var(--font-display)', color: 'var(--ivory)', fontSize: '1.1rem' }}>
               €{Number(listing.price).toLocaleString('de-DE', { minimumFractionDigits: 0 })}
             </p>
-            {listing.size && (
-              <p style={{ fontSize: '0.65rem', color: 'var(--ivory-faint)', letterSpacing: '0.08em' }}>
-                {listing.size}
-              </p>
-            )}
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!user) { navigate('/auth'); return } add(listing) }}
+              style={{
+                background: inCart ? 'rgba(201,168,76,0.15)' : 'var(--charcoal)',
+                border: `1px solid ${inCart ? 'rgba(201,168,76,0.45)' : 'var(--border)'}`,
+                color: inCart ? 'var(--gold)' : 'var(--ivory-faint)',
+                padding: '0.45rem 0.875rem', fontSize: '0.6rem', letterSpacing: '0.12em',
+                textTransform: 'uppercase', fontFamily: 'var(--font-body)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem',
+                transition: 'all 0.15s', flexShrink: 0,
+              }}
+            >
+              <ShoppingBag size={11} strokeWidth={1.5} />
+              {inCart ? 'In Cart' : 'Add'}
+            </button>
           </div>
+          {listing.size && (
+            <p style={{ fontSize: '0.62rem', color: 'var(--ivory-faint)', letterSpacing: '0.08em', marginTop: '0.3rem' }}>
+              {listing.size}
+            </p>
+          )}
         </div>
       </Link>
     </motion.div>
@@ -122,8 +106,6 @@ function ListingCard({ listing }) {
 }
 
 export default function Boutique() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')
