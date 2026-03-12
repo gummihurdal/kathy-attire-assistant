@@ -81,9 +81,9 @@ function ListingCard({ listing }) {
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (!user) { navigate('/auth'); return } add(listing) }}
               style={{
-                background: inCart ? 'rgba(201,168,76,0.15)' : 'var(--charcoal)',
-                border: `1px solid ${inCart ? 'rgba(201,168,76,0.45)' : 'var(--border)'}`,
-                color: inCart ? 'var(--gold)' : 'var(--ivory-faint)',
+                background: inCart ? 'rgba(201,168,76,0.15)' : 'transparent',
+                border: `1px solid ${inCart ? 'rgba(201,168,76,0.6)' : 'rgba(201,168,76,0.5)'}`,
+                color: 'var(--gold)',
                 padding: '0.45rem 0.875rem', fontSize: '0.6rem', letterSpacing: '0.12em',
                 textTransform: 'uppercase', fontFamily: 'var(--font-body)',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem',
