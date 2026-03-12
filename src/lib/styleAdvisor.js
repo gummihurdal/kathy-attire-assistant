@@ -1,7 +1,12 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+function getStyleProfile() {
+  try { return JSON.parse(localStorage.getItem('kathy_style_profile') || 'null') } catch { return null }
+}
+
 export async function analyseWardrobe(wardrobeItems) {
+  const styleProfile = getStyleProfile()
   // 45 second timeout
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 45000)
@@ -15,7 +20,7 @@ export async function analyseWardrobe(wardrobeItems) {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
       },
-      body: JSON.stringify({ wardrobeItems, requestType: 'full_analysis' }),
+      body: JSON.stringify({ wardrobeItems, requestType: 'full_analysis', styleProfile }),
     })
     clearTimeout(timer)
 

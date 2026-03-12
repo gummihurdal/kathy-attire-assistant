@@ -11,6 +11,7 @@ const NAV = [
   { path: '/mirror',   label: 'Mirror ✦' },
   { path: '/lookbook', label: 'Lookbook' },
   { path: '/advisor',  label: 'Style Advisor' },
+  { path: '/profile',  label: 'My Profile' },
 ]
 
 export default function Header() {

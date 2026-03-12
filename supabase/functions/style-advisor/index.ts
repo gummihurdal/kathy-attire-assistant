@@ -10,7 +10,7 @@ serve(async (req) => {
   const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? ""
 
   try {
-    const { wardrobeItems, requestType } = await req.json()
+    const { wardrobeItems, requestType, styleProfile } = await req.json()
 
     const itemsSummary = JSON.stringify(wardrobeItems.map((i: Record<string,unknown>) => ({
       id: i.id, name: i.name, category: i.category,
@@ -29,10 +29,21 @@ serve(async (req) => {
       imageBlocks.push({ type: "image", source: { type: "url", url: item.image_url } })
     }
 
+    // Build body profile context
+    let profileContext = ""
+    if (styleProfile) {
+      const shapeMap: Record<string,string> = { hourglass:"Hourglass", pear:"Pear", apple:"Apple", rectangle:"Rectangle", inverted_triangle:"Inverted Triangle" }
+      const heightMap: Record<string,string> = { petite:"Petite (under 163cm)", average:"Average (163-173cm)", tall:"Tall (over 173cm)" }
+      if (styleProfile.body_shape) profileContext += `\nBody shape: ${shapeMap[styleProfile.body_shape] || styleProfile.body_shape}`
+      if (styleProfile.height) profileContext += `\nHeight: ${heightMap[styleProfile.height] || styleProfile.height}`
+      if (styleProfile.emphasise?.length) profileContext += `\nWants to emphasise: ${styleProfile.emphasise.join(", ")}`
+      if (styleProfile.avoid?.length) profileContext += `\nMust NEVER suggest: ${styleProfile.avoid.join(", ")}`
+    }
+
     if (requestType === "full_analysis") {
       const systemPrompt = `You are Kat, a personal stylist for Katherina, a teenage girl. Be friendly and encouraging. All suggestions must be age-appropriate. Reply ONLY with valid JSON — no markdown, no backticks.`
 
-      const userPrompt = `Wardrobe (${wardrobeItems.length} items): ${itemsSummary}
+      const userPrompt = `Wardrobe (${wardrobeItems.length} items): ${itemsSummary}${profileContext ? "\n\nKatherina's body profile:" + profileContext + "\nUse this to ensure every outfit flatters her shape and height. Respect the avoid list strictly." : ""}
 ${imageBlocks.length > 0 ? `Photos attached for ${imageBlocks.length / 2} items.` : ""}
 
 Return this exact JSON structure:
