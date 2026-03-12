@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { useCart } from '../../lib/cart'
-import { LogOut, Crown, Menu, X, ShoppingBag } from 'lucide-react'
+import { getUnreadCount } from '../../lib/messages'
+import { LogOut, Crown, Menu, X, ShoppingBag, MessageSquare } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const NAV = [
@@ -22,6 +23,14 @@ export default function Header() {
   const { user, signOut } = useAuth()
   const { count, setOpen: openCart } = useCart()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
+
+  useEffect(() => {
+    if (!user) { setUnread(0); return }
+    getUnreadCount().then(setUnread)
+    const interval = setInterval(() => getUnreadCount().then(setUnread), 30000)
+    return () => clearInterval(interval)
+  }, [user])
 
   // Lock body scroll when mobile menu open
   useEffect(() => {
@@ -74,6 +83,23 @@ export default function Header() {
 
           {/* Right side */}
           <div style={S.actions}>
+            {/* Messages icon — logged in only */}
+            {user && (
+              <Link to="/messages" style={{ ...S.iconBtn, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} title="Messages">
+                <MessageSquare size={15} strokeWidth={1.5} color="var(--ivory-faint)" />
+                {unread > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -5, right: -5,
+                    background: 'var(--gold)', color: 'var(--obsidian)',
+                    borderRadius: '50%', width: 15, height: 15,
+                    fontSize: '0.52rem', fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    lineHeight: 1, pointerEvents: 'none',
+                  }}>{unread > 9 ? '9+' : unread}</span>
+                )}
+              </Link>
+            )}
+
             {/* Cart icon — always visible */}
             <button onClick={() => openCart(true)} style={{ ...S.iconBtn, position: 'relative' }} title="My Selection">
               <ShoppingBag size={15} strokeWidth={1.5} />

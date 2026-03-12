@@ -15,6 +15,7 @@ import Profile from './pages/Profile'
 import Boutique from './pages/Boutique'
 import BoutiqueList from './pages/BoutiqueList'
 import BoutiqueItem from './pages/BoutiqueItem'
+import Messages from './pages/Messages'
 import './styles/globals.css'
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/boutique" element={<Boutique />} />
               <Route path="/boutique/sell" element={<BoutiqueList />} />
               <Route path="/boutique/:id" element={<BoutiqueItem />} />
+              <Route path="/messages" element={<Messages />} />
             </Routes>
           </main>
           <footer style={styles.footer}>

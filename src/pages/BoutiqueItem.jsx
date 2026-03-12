@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { getListing } from '../lib/boutique'
 import { useCart } from '../lib/cart'
 import { useAuth } from '../lib/auth'
-import { ShoppingBag, ArrowLeft, Shield, Truck, RefreshCw } from 'lucide-react'
+import { sendMessage, getThread, markThreadRead } from '../lib/messages'
+import { ShoppingBag, ArrowLeft, Shield, Truck, RefreshCw, Send, MessageSquare } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const CONDITION_LABELS = {
   new_tags: 'New with Tags',
@@ -23,6 +25,10 @@ export default function BoutiqueItem() {
   const [loading, setLoading] = useState(true)
   const [activeImg, setActiveImg] = useState(0)
   const [added, setAdded] = useState(false)
+  const [msgText, setMsgText] = useState('')
+  const [thread, setThread] = useState([])
+  const [sending, setSending] = useState(false)
+  const [msgOpen, setMsgOpen] = useState(false)
 
   useEffect(() => {
     getListing(id).then(l => { setListing(l); setLoading(false) }).catch(() => setLoading(false))
@@ -31,6 +37,35 @@ export default function BoutiqueItem() {
   useEffect(() => {
     if (listing) setAdded(items.some(i => i.id === listing.id))
   }, [items, listing])
+
+  useEffect(() => {
+    if (user && listing) {
+      getThread(listing.id).then(setThread)
+      markThreadRead(listing.id)
+    }
+  }, [user, listing])
+
+  const handleSendMsg = async () => {
+    if (!user) { navigate('/auth'); return }
+    if (!msgText.trim()) return
+    setSending(true)
+    try {
+      await sendMessage({
+        listingId: listing.id,
+        sellerId: listing.seller_id,
+        sellerEmail: '',
+        message: msgText,
+      })
+      setMsgText('')
+      const updated = await getThread(listing.id)
+      setThread(updated)
+      toast.success('Message sent', { className: 'toast-royal' })
+    } catch (e) {
+      toast.error(e.message || 'Failed to send', { className: 'toast-royal' })
+    } finally {
+      setSending(false)
+    }
+  }
 
   const handleAdd = () => {
     if (!user) { navigate('/auth'); return }
@@ -194,6 +229,80 @@ export default function BoutiqueItem() {
             <p style={{ marginTop: '1.5rem', fontSize: '0.68rem', color: 'var(--stone)', letterSpacing: '0.06em' }}>
               {listing.views} {listing.views === 1 ? 'member has' : 'members have'} viewed this piece
             </p>
+          )}
+
+          {/* ── Messaging ── */}
+          {user && user.id !== listing.seller_id && (
+            <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+              <button onClick={() => setMsgOpen(v => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: 'var(--ivory-faint)', cursor: 'pointer', fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: 0, marginBottom: msgOpen ? '1rem' : 0 }}>
+                <MessageSquare size={14} strokeWidth={1.5} />
+                {thread.length > 0 ? `Message thread (${thread.length})` : 'Ask the seller a question'}
+              </button>
+
+              <AnimatePresence>
+                {msgOpen && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+                    {/* Thread */}
+                    {thread.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1rem', maxHeight: 260, overflowY: 'auto' }}>
+                        {thread.map(m => {
+                          const mine = m.sender_id === user.id
+                          return (
+                            <div key={m.id} style={{ display: 'flex', justifyContent: mine ? 'flex-end' : 'flex-start' }}>
+                              <div style={{
+                                maxWidth: '78%', padding: '0.55rem 0.8rem',
+                                background: mine ? 'rgba(201,168,76,0.1)' : 'var(--charcoal)',
+                                border: `1px solid ${mine ? 'rgba(201,168,76,0.25)' : 'var(--border)'}`,
+                              }}>
+                                <p style={{ fontSize: '0.78rem', color: 'var(--ivory)', lineHeight: 1.6 }}>{m.message}</p>
+                                <p style={{ fontSize: '0.58rem', color: 'var(--stone)', marginTop: '0.25rem' }}>
+                                  {mine ? 'You' : 'Seller'} · {new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                    {/* Input */}
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <textarea
+                        value={msgText}
+                        onChange={e => setMsgText(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMsg() } }}
+                        placeholder="Ask about condition, measurements, provenance… (Enter to send)"
+                        rows={2}
+                        style={{
+                          flex: 1, background: 'var(--charcoal)', border: '1px solid var(--border)',
+                          color: 'var(--ivory)', fontFamily: 'var(--font-body)', fontSize: '0.8rem',
+                          padding: '0.6rem 0.875rem', resize: 'none', outline: 'none', lineHeight: 1.6,
+                        }}
+                      />
+                      <button onClick={handleSendMsg} disabled={sending || !msgText.trim()}
+                        style={{
+                          background: msgText.trim() ? 'rgba(201,168,76,0.12)' : 'var(--charcoal)',
+                          border: `1px solid ${msgText.trim() ? 'rgba(201,168,76,0.35)' : 'var(--border)'}`,
+                          color: 'var(--gold)', cursor: msgText.trim() ? 'pointer' : 'default',
+                          width: 42, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'all 0.15s', flexShrink: 0,
+                        }}>
+                        <Send size={14} strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {!user && (
+            <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--ivory-faint)' }}>
+                <Link to="/auth" style={{ color: 'var(--gold)', textDecoration: 'none' }}>Sign in</Link> to ask the seller a question
+              </p>
+            </div>
           )}
         </motion.div>
       </div>
