@@ -73,7 +73,11 @@ export default function Admin() {
     views.forEach(v => { pageCounts[v.path] = (pageCounts[v.path] || 0) + 1 })
     const sorted = Object.entries(pageCounts).sort((a,b) => b[1]-a[1]).slice(0,10)
 
-    setStats({ totalViews, todayViews, uniqueSessions, wardrobeItems: wRes.count || 0 })
+    const countryCounts = {}
+    views.forEach(v => { if (v.country) countryCounts[v.country] = (countryCounts[v.country] || 0) + 1 })
+    const topCountries = Object.entries(countryCounts).sort((a,b) => b[1]-a[1]).slice(0,8)
+
+    setStats({ totalViews, todayViews, uniqueSessions, wardrobeItems: wRes.count || 0, topCountries })
     setRecent(views.slice(0, 50))
     setTopPages(sorted)
     setListings(listRes.data || [])
@@ -131,7 +135,7 @@ export default function Admin() {
                 </div>
 
                 <p style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem' }}>Top Pages</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)', marginBottom: '2rem' }}>
                   {topPages.map(([path, count]) => (
                     <div key={path} style={{ background: 'var(--charcoal)', padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.78rem', color: 'var(--ivory)', fontFamily: 'monospace' }}>{path || '/'}</span>
@@ -139,6 +143,20 @@ export default function Admin() {
                     </div>
                   ))}
                 </div>
+
+                {stats.topCountries?.length > 0 && (
+                  <>
+                    <p style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem' }}>Visitors by Country</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+                      {stats.topCountries.map(([country, count]) => (
+                        <div key={country} style={{ background: 'var(--charcoal)', padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--ivory)' }}>{country}</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--ivory-dim)' }}>{count} views</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
 
@@ -150,11 +168,14 @@ export default function Admin() {
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
                   {recent.map(v => (
-                    <div key={v.id} style={{ background: 'var(--charcoal)', padding: '0.7rem 1.25rem', display: 'grid', gridTemplateColumns: '1fr 120px 100px', gap: '1rem', alignItems: 'center' }}>
+                    <div key={v.id} style={{ background: 'var(--charcoal)', padding: '0.7rem 1.25rem', display: 'grid', gridTemplateColumns: '1fr 110px 110px 100px', gap: '1rem', alignItems: 'center' }}>
                       <div>
                         <span style={{ fontSize: '0.75rem', color: 'var(--ivory)', fontFamily: 'monospace' }}>{v.path}</span>
                         {v.referrer && <span style={{ fontSize: '0.62rem', color: 'var(--stone)', marginLeft: '0.75rem' }}>← {v.referrer.replace(/https?:\/\//, '').slice(0,30)}</span>}
                       </div>
+                      <span style={{ fontSize: '0.65rem', color: v.country ? 'var(--ivory-dim)' : 'var(--stone)' }}>
+                        {v.country ? `${v.city ? v.city + ', ' : ''}${v.country}` : '—'}
+                      </span>
                       <span style={{ fontSize: '0.65rem', color: v.user_id ? 'var(--gold)' : 'var(--stone)' }}>
                         {v.user_id ? '● logged in' : '○ anon'}
                       </span>
