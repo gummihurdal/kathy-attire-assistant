@@ -10,7 +10,10 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json()
-    const { path, referrer, user_id, session_id, user_agent } = body
+    const rawPath = body.path || '/'
+    // Strip zero-width spaces and other invisible unicode chars
+    const path = rawPath.replace(/[\u200B-\u200D\uFEFF\u2028\u2029]/g, '').trim() || '/'
+    const { referrer, user_id, session_id, user_agent } = body
 
     // Get real IP from headers (Supabase Edge sets these)
     const ip =
