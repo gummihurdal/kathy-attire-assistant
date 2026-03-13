@@ -5,7 +5,7 @@ import { useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
 
 // Only these emails can access admin
-const ADMIN_EMAILS = ['gudmundur.brekkan@snb.ch', 'gummihurdal@gmail.com', 'brekkan@gmail.com']
+const ADMIN_EMAILS = ['gudmundur.thordarson@snb.ch', 'gudmundur.thordarson@zoho.com', 'gth276@gmail.com', 'gudmundur765@gmail.com']
 
 function StatCard({ label, value, sub }) {
   return (

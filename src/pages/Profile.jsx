@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuth } from '../lib/auth'
 
-const ADMIN_EMAILS = ['gudmundur.brekkan@snb.ch', 'gummihurdal@gmail.com', 'brekkan@gmail.com']
+const ADMIN_EMAILS = ['gudmundur.thordarson@snb.ch', 'gudmundur.thordarson@zoho.com', 'gth276@gmail.com', 'gudmundur765@gmail.com']
 
 const BODY_SHAPES = [
   {
