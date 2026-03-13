@@ -27,7 +27,14 @@ export default function Auth() {
     try {
       if (mode === 'signin') {
         await signIn(email, password)
-        toast.success('Welcome back, Katherina ♛', { className: 'toast-royal' })
+        const names = {
+          'gudmundur.thordarson@snb.ch': 'Katherina',
+          'gudmundur.thordarson@zoho.com': 'Gudmundur',
+          'gth276@gmail.com': 'Gudmundur',
+          'gudmundur765@gmail.com': 'Gudmundur',
+        }
+        const name = names[email.toLowerCase()] || email.split('@')[0]
+        toast.success(`Welcome back, ${name} ♛`, { className: 'toast-royal' })
         navigate('/wardrobe')
       } else {
         await signUp(email, password)
