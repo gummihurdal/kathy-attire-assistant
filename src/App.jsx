@@ -60,7 +60,10 @@ export default function App() {
                 <span style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontStyle: 'italic' }}>Kathy</span>
                 <span style={{ color: 'var(--ivory-faint)', fontSize: '0.7rem', marginLeft: '0.5rem', letterSpacing: '0.1em' }}>Atelier Privé</span>
               </p>
-              <p style={styles.footerRight}>Crafted with love for <em>Katherina</em></p>
+              <p style={styles.footerRight}>
+                <a href="/help.html" style={{ color: 'var(--gold-dark)', textDecoration: 'none', fontSize: '0.7rem', letterSpacing: '0.1em', marginRight: '1.5rem' }}>Help</a>
+                Crafted with love for <em>Katherina</em>
+              </p>
             </div>
           </footer>
         </div>

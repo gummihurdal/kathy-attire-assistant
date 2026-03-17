@@ -182,6 +182,15 @@ export default function Header() {
             ) : (
               <Link to="/auth" style={{...S.overlayLink, color: 'var(--gold)'}} onClick={() => setMobileOpen(false)}>Sign In</Link>
             )}
+
+            <div style={S.overlaySeparator} />
+            <a
+              href="/help.html"
+              style={{ ...S.overlayLink, color: 'var(--ivory-faint)', fontSize: '0.85rem', textDecoration: 'none', display: 'block' }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Help &amp; Guide
+            </a>
           </div>
         </div>
       )}
