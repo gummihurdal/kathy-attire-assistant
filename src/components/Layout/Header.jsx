@@ -174,6 +174,7 @@ export default function Header() {
             </button>
 
             <div style={S.overlaySeparator} />
+            {user ? (
               <>
                 <div style={S.overlayMeta}>{user.email}</div>
                 <button onClick={handleSignOut} style={S.overlaySignOut}>Sign Out</button>
