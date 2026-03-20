@@ -270,7 +270,7 @@ export default function Mirror() {
         )}
       </div>
 
-      <div style={{ ...styles.layout, gridTemplateColumns: isMobile ? '1fr' : 'clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr' }}>
+      <div className="mirror-layout" style={{ gap: '2rem', alignItems: 'start' }}>
         {/* ── LEFT: Photo panel ── */}
         <div style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
@@ -424,7 +424,7 @@ export default function Mirror() {
         </div>
 
         {/* ── RIGHT: Result ── */}
-        <div style={styles.resultPanel}>
+        <div className="mirror-result-panel" style={styles.resultPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>
             {result ? `Styled — ${activeStyleObj?.label}` : 'Your Look Will Appear Here'}
           </p>

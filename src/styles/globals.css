@@ -192,3 +192,31 @@ body.menu-open {
   .style-btn-icon { font-size: 0.85rem !important; }
   .style-buttons-grid { gap: 4px !important; }
 }
+
+/* ── Mirror page layout — responsive ── */
+.mirror-layout {
+  display: grid;
+  grid-template-columns: clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mirror-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  .mirror-result-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .mirror-layout {
+    grid-template-columns: 1fr;
+  }
+  .mirror-result-panel {
+    grid-column: 1;
+    position: static !important;
+  }
+}
