@@ -204,19 +204,33 @@ body.menu-open {
 @media (max-width: 1024px) {
   .mirror-layout {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
   }
   .mirror-result-panel {
     grid-column: 1 / -1;
+    position: static !important;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .mirror-layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
   .mirror-result-panel {
-    grid-column: 1;
+    order: -1;
     position: static !important;
+  }
+  .mirror-photo-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .mirror-photo-main {
+    grid-column: 1;
+  }
+  .mirror-style-panel {
+    grid-column: 2;
   }
 }

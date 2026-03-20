@@ -287,7 +287,7 @@ export default function Mirror() {
 
       <div className="mirror-layout">
         {/* ── LEFT: Photo panel ── */}
-        <div style={styles.photoPanel}>
+        <div className="mirror-photo-panel" style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
 
           {/* Selected photo */}
@@ -358,7 +358,7 @@ export default function Mirror() {
         </div>
 
         {/* ── MIDDLE: Style buttons ── */}
-        <div style={styles.stylePanel}>
+        <div className="mirror-style-panel" style={styles.stylePanel}>
           <p className="section-label" style={{ marginBottom: '1.5rem' }}>Choose Your Style</p>
           <div style={styles.styleButtons} className="style-buttons-grid">
             {STYLES.map(s => (
@@ -663,7 +663,7 @@ const styles = {
   itemNote: { fontSize: '0.68rem', color: 'var(--ivory-faint)', fontWeight: 300, lineHeight: 1.5 },
   stylistNote: { display: 'flex', gap: '0.6rem', marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(201,168,76,0.06)', border: '1px solid var(--gold-dark)', alignItems: 'flex-start' },
   // Result panel
-  resultPanel: { position: 'sticky', top: 'calc(var(--header-h, 60px) + 1.5rem)' },
+  resultPanel: { },
   resultWrap: { position: 'relative', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--charcoal)' },
   resultImg: { width: '100%', display: 'block', maxHeight: '80vh', objectFit: 'contain', background: 'var(--charcoal)' },
   resultLoading: { position: 'relative', border: '1px solid var(--border)', overflow: 'hidden', minHeight: 400, background: 'var(--charcoal)' },
