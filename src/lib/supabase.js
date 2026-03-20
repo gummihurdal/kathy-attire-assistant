@@ -145,7 +145,7 @@ export async function uploadProfilePhoto(file, userId) {
 
 export async function saveProfilePhoto(photo) {
   try {
-    const { data, error } = await supabase.from('profile_photos').insert([photo]).select().single()
+    const { data, error } = await supabase.from('mirror_photos').insert([photo]).select().single()
     if (error) throw error
     return data
   } catch {
@@ -158,7 +158,7 @@ export async function saveProfilePhoto(photo) {
 
 export async function getProfilePhotos(userId) {
   try {
-    const { data, error } = await supabase.from('profile_photos').select('*')
+    const { data, error } = await supabase.from('mirror_photos').select('*')
       .eq('user_id', userId).order('created_at', { ascending: false })
     if (error) throw error
     const ls = lsGet(LS_PROFILE_PHOTOS).filter(p => p.user_id === userId)
@@ -176,7 +176,7 @@ export async function deleteProfilePhoto(id, imageUrl) {
       const path = imageUrl.split('/profile-photos/')[1]
       if (path) await supabase.storage.from('profile-photos').remove([path])
     }
-    await supabase.from('profile_photos').delete().eq('id', id)
+    await supabase.from('mirror_photos').delete().eq('id', id)
   } catch {}
 }
 
