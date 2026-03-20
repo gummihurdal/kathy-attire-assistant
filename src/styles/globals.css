@@ -196,12 +196,12 @@ body.menu-open {
 /* ── Mirror page layout — responsive ── */
 .mirror-layout {
   display: grid;
-  grid-template-columns: clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr;
+  grid-template-columns: minmax(280px, 340px) minmax(200px, 260px) 1fr;
   gap: 2rem;
   align-items: start;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .mirror-layout {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;

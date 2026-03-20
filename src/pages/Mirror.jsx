@@ -275,7 +275,7 @@ export default function Mirror() {
         )}
       </div>
 
-      <div className="mirror-layout" style={{ gap: '2rem', alignItems: 'start' }}>
+      <div className="mirror-layout">
         {/* ── LEFT: Photo panel ── */}
         <div style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
@@ -590,12 +590,6 @@ const styles = {
     background: 'none', border: '1px solid var(--border)', color: 'var(--ivory-faint)',
     padding: '0.6rem 1.25rem', fontSize: '0.65rem', letterSpacing: '0.12em',
     textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'var(--font-body)',
-  },
-  layout: {
-    display: 'grid',
-    gridTemplateColumns: 'clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr',
-    gap: '1.5rem',
-    alignItems: 'start',
   },
   // Photo panel
   photoPanel: { display: 'flex', flexDirection: 'column', gap: '1rem' },

@@ -123,22 +123,13 @@ const LS_PROFILE_PHOTOS = 'kathy_profile_photos'
 const LS_TRYON_RESULTS  = 'kathy_tryon_results'
 
 export async function uploadProfilePhoto(file, userId) {
-  try {
-    const ext = file.name.split('.').pop()
-    const filename = `${userId}/${Date.now()}.${ext}`
-    const { error } = await supabase.storage
-      .from('profile-photos').upload(filename, file, { upsert: false })
-    if (error) throw error
-    const { data: { publicUrl } } = supabase.storage.from('profile-photos').getPublicUrl(filename)
-    return publicUrl
-  } catch {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
+  const ext = (file.name || 'photo.jpg').split('.').pop() || 'jpg'
+  const filename = `${userId}/${Date.now()}.${ext}`
+  const { error } = await supabase.storage
+    .from('profile-photos').upload(filename, file, { upsert: false })
+  if (error) throw new Error(`Photo upload failed: ${error.message}`)
+  const { data: { publicUrl } } = supabase.storage.from('profile-photos').getPublicUrl(filename)
+  return publicUrl
 }
 
 export async function saveProfilePhoto(photo) {
