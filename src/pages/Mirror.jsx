@@ -182,26 +182,37 @@ export default function Mirror() {
       setPhase('generating')
 
       // Step 2: Try-on or generate
-      // Find items with real image URLs
-      const itemsWithImages = (selectedOutfit.selected_items || [])
-        .filter(i => i.image_url && !i.image_url.startsWith('data:'))
+      // If photo is base64, upload to storage now so Replicate can use it
+      let personPhotoUrl = selectedPhoto?.image_url || null
+      if (personPhotoUrl?.startsWith('data:')) {
+        try {
+          const res = await fetch(personPhotoUrl)
+          const blob = await res.blob()
+          const file = new File([blob], 'photo.jpg', { type: blob.type || 'image/jpeg' })
+          const uploaded = await uploadProfilePhoto(file, user?.id || 'demo')
+          if (!uploaded.startsWith('data:')) {
+            personPhotoUrl = uploaded
+            // Update the stored photo record with the real URL
+            setSelectedPhoto(prev => ({ ...prev, image_url: uploaded }))
+          }
+        } catch {}
+      }
 
       let resultUrl = null
       const imagePrompt = selectedOutfit.image_prompt ||
         (selectedOutfit.selected_items || []).map(i => i.name).join(', ') + '. ' + (selectedOutfit.color_story || '')
       const topGarment = selectedOutfit.top_garment
       const bottomGarment = selectedOutfit.bottom_garment
-      const hasPersonPhoto = selectedPhoto?.image_url && !selectedPhoto.image_url.startsWith('data:')
+      const hasPersonPhoto = personPhotoUrl && !personPhotoUrl.startsWith('data:')
       const hasAnyGarmentPhoto =
         (topGarment?.image_url && !topGarment.image_url.startsWith('data:')) ||
         (bottomGarment?.image_url && !bottomGarment.image_url.startsWith('data:'))
 
       if (hasPersonPhoto && hasAnyGarmentPhoto) {
-        // ✦ Best: chained IDM-VTON — applies top then bottom onto exact body, Flux finishes shoes/accessories
         setPhase('generating')
         try {
           resultUrl = await runFullTryOn({
-            personImageUrl: selectedPhoto.image_url,
+            personImageUrl: personPhotoUrl,
             topGarment,
             bottomGarment,
             imagePrompt,
@@ -212,9 +223,8 @@ export default function Mirror() {
       }
 
       if (!resultUrl && hasPersonPhoto) {
-        // ✦ Good: Flux Kontext — complete style redress on her photo
         try {
-          resultUrl = await runFluxTryOn({ personImageUrl: selectedPhoto.image_url, imagePrompt })
+          resultUrl = await runFluxTryOn({ personImageUrl: personPhotoUrl, imagePrompt })
         } catch (e) {
           console.warn('Flux Kontext failed, generating look:', e.message)
         }
