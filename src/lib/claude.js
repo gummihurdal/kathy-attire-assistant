@@ -17,10 +17,19 @@ async function callClaude(payload) {
     }
   )
   if (!response.ok) {
-    const err = await response.json()
-    throw new Error(err.error?.message || err.error || 'AI request failed')
+    let errMsg = `AI request failed (${response.status})`
+    try {
+      const text = await response.text()
+      if (text) {
+        const err = JSON.parse(text)
+        errMsg = err.error?.message || err.error || errMsg
+      }
+    } catch {}
+    throw new Error(errMsg)
   }
-  return response.json()
+  const responseText = await response.text()
+  if (!responseText) throw new Error('Empty response from AI service')
+  return JSON.parse(responseText)
 }
 
 export const STYLE_PROFILES = {
