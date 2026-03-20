@@ -152,6 +152,18 @@ export default function Mirror() {
     toast.success('Photo removed', { className: 'toast-royal' })
   }
 
+  const handleExportStory = async () => {
+    if (!result) return
+    try {
+      setExporting(true)
+      await exportStoryCard({ resultUrl: result, styleName: activeStyleObj?.label || '' })
+    } catch {
+      toast.error('Could not create story card', { className: 'toast-royal' })
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const handleStyleClick = async (styleKey) => {
     if (!selectedPhoto) {
       toast.error('Please add a photo of yourself first', { className: 'toast-royal' })
@@ -457,14 +469,14 @@ export default function Mirror() {
                       {phase === 'selecting' ? 'Selecting your outfit…' : 'Creating your look…'}
                     </p>
                     <p style={{ ...styles.loadingSubtitle, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                      {phase === 'selecting' ? 'Claude is styling you' : 'AI try-on in progress · up to 90s'}
+                      {phase === 'selecting' ? 'Claude is styling you' : 'AI try-on in progress · up to 30s'}
                     </p>
                     <div style={{ width: 120, height: 2, background: 'var(--border)', borderRadius: 2, overflow: 'hidden', marginTop: '0.5rem' }}>
                       <motion.div
                         style={{ height: '100%', background: 'var(--gold)', borderRadius: 2 }}
                         initial={{ width: '0%' }}
                         animate={{ width: phase === 'selecting' ? '40%' : '90%' }}
-                        transition={{ duration: phase === 'selecting' ? 3 : 80, ease: 'linear' }}
+                        transition={{ duration: phase === 'selecting' ? 3 : 28, ease: 'linear' }}
                       />
                     </div>
                   </div>
