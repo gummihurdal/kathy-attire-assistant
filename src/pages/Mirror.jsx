@@ -80,7 +80,7 @@ const HAIR_TIPS = {
 
 
 export default function Mirror() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [photos, setPhotos] = useState([])
   const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [wardrobeItems, setWardrobeItems] = useState([])
@@ -95,7 +95,9 @@ export default function Mirror() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const resultPanelRef = useRef(null)
 
-  useEffect(() => { loadData() }, [user])
+  useEffect(() => {
+    if (!authLoading) loadData()
+  }, [user, authLoading])
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
@@ -253,6 +255,13 @@ export default function Mirror() {
 
   return (
     <div style={styles.page}>
+      {authLoading && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem', color: 'var(--ivory-faint)' }}>
+          <Loader size={20} strokeWidth={1} style={{ animation: 'spin 1s linear infinite', color: 'var(--gold)' }} />
+          <span style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}>Loading…</span>
+        </div>
+      )}
+      {!authLoading && <>
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -572,6 +581,7 @@ export default function Mirror() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
       `}</style>
+      </>}
     </div>
   )
 }
