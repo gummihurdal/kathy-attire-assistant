@@ -9,7 +9,7 @@ import {
   uploadProfilePhoto, saveProfilePhoto, getProfilePhotos,
   deleteProfilePhoto, getWardrobeItems, saveTryOnResult, getTryOnResults
 } from '../lib/supabase'
-import { selectOutfitForStyle, runFullTryOn, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
+import { selectOutfitForStyle, runFluxTryOn, generateLookImage, STYLES } from '../lib/tryon'
 
 const HAIR_TIPS = {
   sporty: {
@@ -172,17 +172,12 @@ export default function Mirror() {
     }, 100)
 
     try {
-      // Step 1: Claude selects outfit
-      const selectedOutfit = await selectOutfitForStyle({
-        wardrobeItems,
-        style: styleKey,
-        personPhotoUrl: selectedPhoto.image_url?.startsWith('data:') ? null : selectedPhoto.image_url,
-      })
+      // Step 1: Select outfit
+      const selectedOutfit = await selectOutfitForStyle({ wardrobeItems, style: styleKey })
       setOutfit(selectedOutfit)
       setPhase('generating')
 
-      // Step 2: Try-on or generate
-      // If photo is base64, upload to storage now so Replicate can use it
+      // Step 2: If photo is base64, upload to storage first so Replicate can fetch it
       let personPhotoUrl = selectedPhoto?.image_url || null
       if (personPhotoUrl?.startsWith('data:')) {
         try {
@@ -192,52 +187,33 @@ export default function Mirror() {
           const uploaded = await uploadProfilePhoto(file, user?.id || 'demo')
           if (!uploaded.startsWith('data:')) {
             personPhotoUrl = uploaded
-            // Update the stored photo record with the real URL
             setSelectedPhoto(prev => ({ ...prev, image_url: uploaded }))
           }
         } catch {}
       }
 
-      let resultUrl = null
       const imagePrompt = selectedOutfit.image_prompt ||
-        (selectedOutfit.selected_items || []).map(i => i.name).join(', ') + '. ' + (selectedOutfit.color_story || '')
-      const topGarment = selectedOutfit.top_garment
-      const bottomGarment = selectedOutfit.bottom_garment
+        (selectedOutfit.selected_items || []).map(i => i.name).join(', ')
       const hasPersonPhoto = personPhotoUrl && !personPhotoUrl.startsWith('data:')
-      const hasAnyGarmentPhoto =
-        (topGarment?.image_url && !topGarment.image_url.startsWith('data:')) ||
-        (bottomGarment?.image_url && !bottomGarment.image_url.startsWith('data:'))
 
-      if (hasPersonPhoto && hasAnyGarmentPhoto) {
-        setPhase('generating')
-        try {
-          resultUrl = await runFullTryOn({
-            personImageUrl: personPhotoUrl,
-            topGarment,
-            bottomGarment,
-            imagePrompt,
-          })
-        } catch (e) {
-          console.warn('Full try-on failed, trying Flux:', e.message)
-        }
-      }
+      let resultUrl = null
 
-      if (!resultUrl && hasPersonPhoto) {
+      // Step 3: Flux Kontext redress (fast ~20s, preserves face/body)
+      if (hasPersonPhoto) {
         try {
           resultUrl = await runFluxTryOn({ personImageUrl: personPhotoUrl, imagePrompt })
         } catch (e) {
-          console.warn('Flux Kontext failed, generating look:', e.message)
+          console.warn('Flux try-on failed, falling back to generation:', e.message)
         }
       }
 
+      // Step 4: Fallback — pure generation if no photo or Flux failed
       if (!resultUrl) {
-        // ✦ Fallback: pure AI fashion generation
         resultUrl = await generateLookImage({ imagePrompt })
       }
 
       setResult(resultUrl)
 
-      // Save the result
       await saveTryOnResult({
         user_id: user?.id || 'demo',
         profile_photo_url: selectedPhoto.image_url,
