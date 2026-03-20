@@ -96,16 +96,16 @@ Respond ONLY valid JSON (no backticks):
 }`,
       }]
 
-      if (personPhotoUrl && !personPhotoUrl.startsWith("data:")) {
-        blocks.push({ type: "text", text: "Person photo:" })
-        blocks.push({ type: "image", source: { type: "url", url: personPhotoUrl } })
-      }
+      // Skip sending person photo to Anthropic — Supabase storage URLs are not
+      // accessible from Anthropic's servers. Outfit selection is text-only.
+      void personPhotoUrl
       const withPhotos = (wardrobeItems as Record<string,unknown>[])
         .filter(i => i.image_url && !(i.image_url as string).startsWith("data:")).slice(0, 6)
-      for (const item of withPhotos) {
-        blocks.push({ type: "text", text: `[${item.category}] ${item.name}:` })
-        blocks.push({ type: "image", source: { type: "url", url: item.image_url } })
-      }
+      // NOTE: We intentionally skip sending wardrobe images to Anthropic here.
+      // Supabase storage URLs are not publicly accessible from Anthropic's servers,
+      // causing image fetch errors. Claude selects outfits from text metadata alone.
+      // Images are used downstream in the actual try-on step only.
+      void withPhotos // suppress unused warning
 
       const r = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -113,8 +113,20 @@ Respond ONLY valid JSON (no backticks):
         body: JSON.stringify({ model: "claude-opus-4-5", max_tokens: 1200, messages: [{ role: "user", content: blocks }] }),
       })
       const d = await r.json()
-      const txt = (d.content?.[0]?.text ?? "") as string
+      if (!d.content?.[0]?.text) throw new Error(d.error?.message || "Empty response from AI")
+      const txt = (d.content[0].text) as string
       const outfit = JSON.parse(txt.replace(/```json|```/g, "").trim())
+
+      // Re-hydrate image_url fields — Claude returned nulls since it couldn't see photos
+      const itemMap = new Map((wardrobeItems as Record<string,unknown>[]).map(i => [i.id as string, i.image_url as string|null]))
+      if (outfit.selected_items) {
+        outfit.selected_items = outfit.selected_items.map((i: Record<string,unknown>) => ({
+          ...i, image_url: itemMap.get(i.id as string) ?? i.image_url ?? null
+        }))
+      }
+      if (outfit.top_garment?.id) outfit.top_garment.image_url = itemMap.get(outfit.top_garment.id) ?? null
+      if (outfit.bottom_garment?.id) outfit.bottom_garment.image_url = itemMap.get(outfit.bottom_garment.id) ?? null
+
       return new Response(JSON.stringify(outfit), { headers: { ...cors, "Content-Type": "application/json" } })
     }
 
