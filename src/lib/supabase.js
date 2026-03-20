@@ -123,10 +123,12 @@ const LS_PROFILE_PHOTOS = 'kathy_profile_photos'
 const LS_TRYON_RESULTS  = 'kathy_tryon_results'
 
 export async function uploadProfilePhoto(file, userId) {
-  const ext = (file.name || 'photo.jpg').split('.').pop() || 'jpg'
+  // Determine extension from mime type or filename
+  const mimeToExt = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/heic': 'jpg', 'image/heif': 'jpg' }
+  const ext = mimeToExt[file.type] || (file.name || '').split('.').pop() || 'jpg'
   const filename = `${userId}/${Date.now()}.${ext}`
   const { error } = await supabase.storage
-    .from('profile-photos').upload(filename, file, { upsert: false })
+    .from('profile-photos').upload(filename, file, { upsert: true, contentType: file.type || 'image/jpeg' })
   if (error) throw new Error(`Photo upload failed: ${error.message}`)
   const { data: { publicUrl } } = supabase.storage.from('profile-photos').getPublicUrl(filename)
   return publicUrl

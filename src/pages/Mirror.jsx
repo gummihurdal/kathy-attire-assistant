@@ -131,7 +131,7 @@ export default function Mirror() {
       setSelectedPhoto(photo)
       toast.success('Photo added ✦', { className: 'toast-royal' })
     } catch (err) {
-      toast.error('Could not upload photo', { className: 'toast-royal' })
+      toast.error(err.message || 'Could not upload photo', { className: 'toast-royal' })
     } finally {
       setUploadingPhoto(false)
     }
