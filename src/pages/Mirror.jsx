@@ -212,18 +212,22 @@ export default function Mirror() {
 
       let resultUrl = null
 
-      // Step 3: FASHN try-on (5-15s) with garment photos, Flux fallback
+      // Step 3: FASHN try-on with real garments + Flux shoes finish
       if (hasPersonPhoto) {
         try {
           const topUrl = selectedOutfit.top_garment?.image_url && !selectedOutfit.top_garment.image_url.startsWith('data:')
             ? selectedOutfit.top_garment.image_url : null
           const bottomUrl = selectedOutfit.bottom_garment?.image_url && !selectedOutfit.bottom_garment.image_url.startsWith('data:')
             ? selectedOutfit.bottom_garment.image_url : null
+          const shoesDescription = selectedOutfit.shoes?.name
+            ? `${selectedOutfit.shoes.name}${selectedOutfit.shoes.description ? ' — ' + selectedOutfit.shoes.description : ''}`
+            : null
           resultUrl = await runFluxTryOn({
             personImageUrl: personPhotoUrl,
             imagePrompt,
             topGarmentUrl: topUrl,
             bottomGarmentUrl: bottomUrl,
+            shoesDescription,
           })
         } catch (e) {
           console.warn('Try-on failed, falling back to generation:', e.message)
