@@ -97,6 +97,8 @@ export default function Mirror() {
 
   useEffect(() => { loadData() }, [user])
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
   const loadData = async () => {
     const userId = user?.id || 'demo'
     const [p, w, r] = await Promise.all([
@@ -268,7 +270,7 @@ export default function Mirror() {
         )}
       </div>
 
-      <div style={styles.layout}>
+      <div style={{ ...styles.layout, gridTemplateColumns: isMobile ? '1fr' : 'clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr' }}>
         {/* ── LEFT: Photo panel ── */}
         <div style={styles.photoPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>Your Photos</p>
@@ -586,8 +588,8 @@ const styles = {
   },
   layout: {
     display: 'grid',
-    gridTemplateColumns: '220px 220px 1fr',
-    gap: '2rem',
+    gridTemplateColumns: 'clamp(160px, 22vw, 240px) clamp(160px, 22vw, 240px) 1fr',
+    gap: '1.5rem',
     alignItems: 'start',
   },
   // Photo panel
@@ -652,7 +654,7 @@ const styles = {
   itemNote: { fontSize: '0.68rem', color: 'var(--ivory-faint)', fontWeight: 300, lineHeight: 1.5 },
   stylistNote: { display: 'flex', gap: '0.6rem', marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(201,168,76,0.06)', border: '1px solid var(--gold-dark)', alignItems: 'flex-start' },
   // Result panel
-  resultPanel: { position: 'sticky', top: 'calc(var(--header-h) + 1.5rem)' },
+  resultPanel: { position: 'sticky', top: 'calc(var(--header-h, 60px) + 1.5rem)' },
   resultWrap: { position: 'relative', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--charcoal)' },
   resultImg: { width: '100%', display: 'block', maxHeight: '80vh', objectFit: 'contain', background: 'var(--charcoal)' },
   resultLoading: { position: 'relative', border: '1px solid var(--border)', overflow: 'hidden', minHeight: 400, background: 'var(--charcoal)' },
