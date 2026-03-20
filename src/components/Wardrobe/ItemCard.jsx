@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Trash2, Tag } from 'lucide-react'
 
@@ -8,9 +8,15 @@ const CATEGORY_ICONS = {
   swimwear: '◇', lingerie: '◉',
 }
 
+// Detect touch device
+const isTouchDevice = () => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
 export default function ItemCard({ item, onDelete, selectable, selected, onSelect }) {
   const [hovered, setHovered] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const longPressTimer = useRef(null)
+  const touch = isTouchDevice()
 
   const handleDelete = async (e) => {
     e.stopPropagation()
@@ -19,12 +25,26 @@ export default function ItemCard({ item, onDelete, selectable, selected, onSelec
       setTimeout(() => setConfirming(false), 2500)
       return
     }
+    setMenuOpen(false)
+    setConfirming(false)
     onDelete(item)
   }
 
   const handleClick = () => {
+    if (menuOpen) { setMenuOpen(false); return }
     if (selectable && onSelect) onSelect(item)
   }
+
+  // Long-press to open delete menu on mobile
+  const handleTouchStart = useCallback(() => {
+    longPressTimer.current = setTimeout(() => {
+      setMenuOpen(true)
+    }, 500)
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    clearTimeout(longPressTimer.current)
+  }, [])
 
   return (
     <motion.div
@@ -34,8 +54,10 @@ export default function ItemCard({ item, onDelete, selectable, selected, onSelec
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      onHoverStart={() => !touch && setHovered(true)}
+      onHoverEnd={() => !touch && setHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       onClick={handleClick}
       style={{
         ...styles.card,
@@ -54,8 +76,8 @@ export default function ItemCard({ item, onDelete, selectable, selected, onSelec
           </div>
         )}
 
-        {/* Overlay on hover */}
-        {hovered && (
+        {/* Overlay on hover (desktop) or tap menu (mobile) */}
+        {(hovered || menuOpen) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,10 +93,25 @@ export default function ItemCard({ item, onDelete, selectable, selected, onSelec
                 }}
               >
                 <Trash2 size={12} strokeWidth={1.5} />
-                <span>{confirming ? 'Confirm' : 'Remove'}</span>
+                <span>{confirming ? 'Confirm?' : 'Remove'}</span>
               </button>
             )}
           </motion.div>
+        )}
+
+        {/* Mobile: always-visible trash icon tap target */}
+        {onDelete && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v) }}
+            style={{
+              ...styles.mobileTrashBtn,
+              display: typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches ? 'flex' : 'none',
+              background: menuOpen ? 'rgba(180,40,40,0.85)' : 'rgba(0,0,0,0.55)',
+            }}
+            aria-label="Remove item"
+          >
+            <Trash2 size={13} strokeWidth={1.5} color="var(--ivory)" />
+          </button>
         )}
 
         {/* Selected badge */}
@@ -155,6 +192,21 @@ const styles = {
     gap: '0.4rem',
     transition: 'background 0.2s',
     textTransform: 'uppercase',
+  },
+  mobileTrashBtn: {
+    position: 'absolute',
+    top: '0.5rem',
+    right: '0.5rem',
+    width: 30,
+    height: 30,
+    borderRadius: '50%',
+    border: '1px solid rgba(255,255,255,0.2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 10,
+    transition: 'background 0.2s',
   },
   selectedBadge: {
     position: 'absolute',
