@@ -22,8 +22,8 @@ export async function selectOutfitForStyle({ wardrobeItems, style }) {
 }
 
 // Step 2a: Flux Kontext — redress person photo with selected outfit (~20s)
-export async function runFluxTryOn({ personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesDescription }) {
-  const data = await callEdge('tryon_flux', { personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesDescription })
+export async function runFluxTryOn({ personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesGarmentUrl }) {
+  const data = await callEdge('tryon_flux', { personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesGarmentUrl })
   return data.result_url
 }
 

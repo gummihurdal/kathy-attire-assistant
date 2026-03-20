@@ -92,7 +92,7 @@ ${JSON.stringify(wardrobeItems.map((i: Record<string,unknown>) => ({
 
 Select a complete stylish outfit. Prefer items with has_photo: true.
 Respond ONLY valid JSON (no backticks):
-{"outfit_name":"","tagline":"","selected_items":[{"id":"","name":"","category":"","image_url":null,"styling_note":""}],"top_garment":{"id":"","name":"","category":"tops","image_url":null,"description":""},"bottom_garment":{"id":"","name":"","category":"bottoms","image_url":null,"description":""},"shoes":{"id":"","name":"","description":"","image_url":null},"color_story":"","image_prompt":"detailed head-to-toe outfit description, tall athletic man, photorealistic fashion editorial","stylist_note":""}` }],
+{"outfit_name":"","tagline":"","selected_items":[{"id":"","name":"","category":"","image_url":null,"styling_note":""}],"top_garment":{"id":"","name":"","category":"tops","image_url":null,"description":""},"bottom_garment":{"id":"","name":"","category":"bottoms","image_url":null,"description":""},"shoes_garment":{"id":"","name":"","category":"shoes","image_url":null,"description":""},"color_story":"","image_prompt":"detailed head-to-toe outfit description, tall athletic man, photorealistic fashion editorial","stylist_note":""}` }],
         }),
       })
       const d = await r.json()
@@ -102,61 +102,42 @@ Respond ONLY valid JSON (no backticks):
       if (outfit.selected_items) outfit.selected_items = outfit.selected_items.map((i: Record<string,unknown>) => ({ ...i, image_url: itemMap.get(i.id as string) ?? null }))
       if (outfit.top_garment?.id) outfit.top_garment.image_url = itemMap.get(outfit.top_garment.id) ?? null
       if (outfit.bottom_garment?.id) outfit.bottom_garment.image_url = itemMap.get(outfit.bottom_garment.id) ?? null
-      if (outfit.shoes?.id) outfit.shoes.image_url = itemMap.get(outfit.shoes.id) ?? null
+      if (outfit.shoes_garment?.id) outfit.shoes_garment.image_url = itemMap.get(outfit.shoes_garment.id) ?? null
       return new Response(JSON.stringify(outfit), { headers: { ...cors, "Content-Type": "application/json" } })
     }
 
     if (action === "tryon_flux") {
-      const { personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesDescription } = body
+      const { personImageUrl, imagePrompt, topGarmentUrl, bottomGarmentUrl, shoesGarmentUrl } = body
 
       let currentImage = personImageUrl
+      let fashnRan = false
 
-      // FASHN pass 1: apply top garment
+      // Pass 1: top garment
       if (FAL_KEY && topGarmentUrl && !topGarmentUrl.startsWith("data:")) {
         try {
           currentImage = await falTryOn(currentImage, topGarmentUrl, "tops", FAL_KEY)
-        } catch (e) {
-          console.error("FASHN top failed:", e instanceof Error ? e.message : e)
-          currentImage = personImageUrl // reset on failure
-        }
+          fashnRan = true
+        } catch (e) { console.error("FASHN top failed:", e instanceof Error ? e.message : e) }
       }
 
-      // FASHN pass 2: apply bottom garment
+      // Pass 2: bottom garment (trousers)
       if (FAL_KEY && bottomGarmentUrl && !bottomGarmentUrl.startsWith("data:")) {
         try {
           currentImage = await falTryOn(currentImage, bottomGarmentUrl, "bottoms", FAL_KEY)
-        } catch (e) {
-          console.error("FASHN bottom failed:", e instanceof Error ? e.message : e)
-        }
+          fashnRan = true
+        } catch (e) { console.error("FASHN bottom failed:", e instanceof Error ? e.message : e) }
       }
 
-      // Flux finishing pass: add shoes + accessories from wardrobe description
-      if (currentImage !== personImageUrl && REPLICATE_KEY) {
+      // Pass 3: shoes (using bottoms category — FASHN handles shoes this way)
+      if (FAL_KEY && shoesGarmentUrl && !shoesGarmentUrl.startsWith("data:")) {
         try {
-          const shoesPrompt = shoesDescription
-            ? `Keep this exact person and their outfit unchanged. Only add shoes: ${shoesDescription}. Keep everything else identical. Photorealistic.`
-            : `Keep this exact person and their outfit unchanged. Add appropriate shoes to complete the look. Keep everything else identical. Photorealistic.`
-          const res = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions", {
-            method: "POST",
-            headers: { Authorization: `Token ${REPLICATE_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ input: { prompt: shoesPrompt, input_image: currentImage, aspect_ratio: "2:3", output_format: "jpg", output_quality: 92, safety_tolerance: 3 } }),
-          })
-          const pred = await res.json()
-          if (!pred.error) {
-            for (let i = 0; i < 20; i++) {
-              await new Promise(r => setTimeout(r, 2000))
-              const poll = await (await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`, { headers: { Authorization: `Token ${REPLICATE_KEY}` } })).json()
-              if (poll.status === "succeeded") { const out = Array.isArray(poll.output) ? poll.output[0] : poll.output; if (out) { currentImage = out; break } }
-              if (poll.status === "failed") break
-            }
-          }
-        } catch (e) {
-          console.error("Flux shoes pass failed:", e instanceof Error ? e.message : e)
-        }
+          currentImage = await falTryOn(currentImage, shoesGarmentUrl, "bottoms", FAL_KEY)
+          fashnRan = true
+        } catch (e) { console.error("FASHN shoes failed:", e instanceof Error ? e.message : e) }
       }
 
-      // If FASHN never ran, fall back to full Flux redress
-      if (currentImage === personImageUrl) {
+      // If no FASHN ran at all, fall back to Flux text-based redress
+      if (!fashnRan) {
         currentImage = await fluxTryOn(personImageUrl, imagePrompt, REPLICATE_KEY)
       }
 

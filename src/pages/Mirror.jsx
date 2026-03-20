@@ -219,15 +219,14 @@ export default function Mirror() {
             ? selectedOutfit.top_garment.image_url : null
           const bottomUrl = selectedOutfit.bottom_garment?.image_url && !selectedOutfit.bottom_garment.image_url.startsWith('data:')
             ? selectedOutfit.bottom_garment.image_url : null
-          const shoesDescription = selectedOutfit.shoes?.name
-            ? `${selectedOutfit.shoes.name}${selectedOutfit.shoes.description ? ' — ' + selectedOutfit.shoes.description : ''}`
-            : null
+          const shoesUrl = selectedOutfit.shoes_garment?.image_url && !selectedOutfit.shoes_garment.image_url.startsWith('data:')
+            ? selectedOutfit.shoes_garment.image_url : null
           resultUrl = await runFluxTryOn({
             personImageUrl: personPhotoUrl,
             imagePrompt,
             topGarmentUrl: topUrl,
             bottomGarmentUrl: bottomUrl,
-            shoesDescription,
+            shoesGarmentUrl: shoesUrl,
           })
         } catch (e) {
           console.warn('Try-on failed, falling back to generation:', e.message)
