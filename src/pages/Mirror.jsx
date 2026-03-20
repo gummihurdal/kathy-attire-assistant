@@ -155,8 +155,8 @@ export default function Mirror() {
       toast.error('Please add a photo of yourself first', { className: 'toast-royal' })
       return
     }
-    if (wardrobeItems.length < 2) {
-      toast.error('Please add at least 2 items to your wardrobe', { className: 'toast-royal' })
+    if (wardrobeItems.length < 1) {
+      toast.error('Please add at least 1 item to your wardrobe first', { className: 'toast-royal' })
       return
     }
 
@@ -165,6 +165,11 @@ export default function Mirror() {
     setResult(null)
     setOutfit(null)
     setPhase('selecting')
+
+    // Scroll result panel into view on mobile
+    setTimeout(() => {
+      resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
 
     try {
       // Step 1: Claude selects outfit
@@ -424,7 +429,7 @@ export default function Mirror() {
         </div>
 
         {/* ── RIGHT: Result ── */}
-        <div className="mirror-result-panel" style={styles.resultPanel}>
+        <div ref={resultPanelRef} className="mirror-result-panel" style={styles.resultPanel}>
           <p className="section-label" style={{ marginBottom: '1rem' }}>
             {result ? `Styled — ${activeStyleObj?.label}` : 'Your Look Will Appear Here'}
           </p>
