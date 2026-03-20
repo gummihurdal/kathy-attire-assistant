@@ -594,9 +594,9 @@ const styles = {
   },
   // Photo panel
   photoPanel: { display: 'flex', flexDirection: 'column', gap: '1rem' },
-  mainPhotoWrap: { position: 'relative', aspectRatio: '2/3', background: 'var(--charcoal)', border: '1px solid var(--border)', overflow: 'hidden' },
-  mainPhotoInner: { width: '100%', height: '100%', position: 'relative' },
-  mainPhoto: { width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', background: 'var(--charcoal)' },
+  mainPhotoWrap: { position: 'relative', minHeight: 320, maxHeight: '75vh', background: 'var(--charcoal)', border: '1px solid var(--border)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  mainPhotoInner: { width: '100%', height: '100%', position: 'relative', display: 'flex' },
+  mainPhoto: { width: '100%', height: 'auto', maxHeight: '75vh', objectFit: 'contain', objectPosition: 'center', display: 'block' },
   photoOverlay: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
