@@ -596,7 +596,7 @@ const styles = {
   photoPanel: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   mainPhotoWrap: { position: 'relative', aspectRatio: '2/3', background: 'var(--charcoal)', border: '1px solid var(--border)', overflow: 'hidden' },
   mainPhotoInner: { width: '100%', height: '100%', position: 'relative' },
-  mainPhoto: { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' },
+  mainPhoto: { width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', background: 'var(--charcoal)' },
   photoOverlay: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
@@ -616,7 +616,7 @@ const styles = {
     width: 52, height: 68, position: 'relative', cursor: 'pointer',
     border: '1px solid var(--border)', overflow: 'hidden', flexShrink: 0,
   },
-  thumbImg: { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' },
+  thumbImg: { width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', background: 'var(--charcoal)' },
   thumbDelete: {
     position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.7)',
     border: 'none', color: 'var(--ivory)', cursor: 'pointer', width: 16, height: 16,
