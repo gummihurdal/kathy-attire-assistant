@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
 import { Camera, Sparkles, Loader, Trash2, Star, Download, ChevronLeft, ChevronRight, Plus, Share2 } from 'lucide-react'
@@ -93,6 +93,7 @@ export default function Mirror() {
   const [exporting, setExporting] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const resultPanelRef = useRef(null)
 
   useEffect(() => { loadData() }, [user])
 
@@ -437,14 +438,24 @@ export default function Mirror() {
               >
                 <div style={styles.loadingShimmer}>
                   {selectedPhoto && (
-                    <img src={selectedPhoto.image_url} alt="" style={{ ...styles.resultImg, filter: 'blur(8px) brightness(0.4)', position: 'absolute', inset: 0 }} />
+                    <img src={selectedPhoto.image_url} alt="" style={{ ...styles.resultImg, filter: 'blur(12px) brightness(0.25)', position: 'absolute', inset: 0 }} />
                   )}
-                  <div style={styles.loadingOverlay}>
-                    <Sparkles size={40} color="var(--gold)" strokeWidth={1} style={{ animation: 'pulse 2s ease-in-out infinite' }} />
-                    <p style={styles.loadingTitle}>
-                      {phase === 'selecting' ? 'Selecting outfit…' : 'Dressing you up…'}
+                  <div style={{ ...styles.loadingOverlay, zIndex: 2, background: 'rgba(0,0,0,0.55)' }}>
+                    <Sparkles size={36} color="var(--gold)" strokeWidth={1} style={{ animation: 'pulse 2s ease-in-out infinite' }} />
+                    <p style={{ ...styles.loadingTitle, color: 'var(--ivory)', textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>
+                      {phase === 'selecting' ? 'Selecting your outfit…' : 'Creating your look…'}
                     </p>
-                    <p style={styles.loadingSubtitle}>AI is working its magic</p>
+                    <p style={{ ...styles.loadingSubtitle, color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                      {phase === 'selecting' ? 'Claude is styling you' : 'AI try-on in progress · up to 90s'}
+                    </p>
+                    <div style={{ width: 120, height: 2, background: 'var(--border)', borderRadius: 2, overflow: 'hidden', marginTop: '0.5rem' }}>
+                      <motion.div
+                        style={{ height: '100%', background: 'var(--gold)', borderRadius: 2 }}
+                        initial={{ width: '0%' }}
+                        animate={{ width: phase === 'selecting' ? '40%' : '90%' }}
+                        transition={{ duration: phase === 'selecting' ? 3 : 80, ease: 'linear' }}
+                      />
+                    </div>
                   </div>
                 </div>
               </motion.div>
