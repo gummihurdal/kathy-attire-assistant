@@ -12,10 +12,12 @@ async function falTryOn(modelImage: string, garmentImage: string, category: stri
     body: JSON.stringify({
       model_image: modelImage,
       garment_image: garmentImage,
-      category,
-      mode: "balanced",
+      category,           // tops, bottoms, or auto
+      mode: "quality",    // best identity preservation
       garment_photo_type: "auto",
       restore_background: true,
+      restore_clothes: false,
+      long_top: false,
     }),
   })
   const submitted = await submitRes.json()
@@ -30,7 +32,7 @@ async function falTryOn(modelImage: string, garmentImage: string, category: stri
     })
     const result = await res.json()
     if (result.images?.[0]?.url) return result.images[0].url
-    if (result.detail && !result.detail.includes("still processing")) throw new Error(result.detail)
+    if (result.detail && !result.detail.includes("still processing") && !result.detail.includes("IN_PROGRESS")) throw new Error(result.detail)
   }
   throw new Error("FASHN timed out")
 }
@@ -128,12 +130,26 @@ Respond ONLY valid JSON (no backticks):
         } catch (e) { console.error("FASHN bottom failed:", e instanceof Error ? e.message : e) }
       }
 
-      // Pass 3: shoes (using bottoms category — FASHN handles shoes this way)
-      if (FAL_KEY && shoesGarmentUrl && !shoesGarmentUrl.startsWith("data:")) {
+      // Pass 3: shoes via Flux Kontext (FASHN doesn't support shoes)
+      // Describe the shoes from wardrobe photo precisely so Flux renders them correctly
+      if (REPLICATE_KEY && shoesGarmentUrl && !shoesGarmentUrl.startsWith("data:") && currentImage !== personImageUrl) {
         try {
-          currentImage = await falTryOn(currentImage, shoesGarmentUrl, "bottoms", FAL_KEY)
-          fashnRan = true
-        } catch (e) { console.error("FASHN shoes failed:", e instanceof Error ? e.message : e) }
+          const prompt = `Keep this exact person — same face, hair, body proportions. Keep the shirt and trousers exactly as they are. Only change the shoes/footwear to match these boots/shoes (shown in the reference). Preserve everything else. Photorealistic.`
+          const res = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions", {
+            method: "POST",
+            headers: { Authorization: `Token ${REPLICATE_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ input: { prompt, input_image: currentImage, aspect_ratio: "2:3", output_format: "jpg", output_quality: 92, safety_tolerance: 3 } }),
+          })
+          const pred = await res.json()
+          if (!pred.error) {
+            for (let i = 0; i < 20; i++) {
+              await new Promise(r => setTimeout(r, 2000))
+              const poll = await (await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`, { headers: { Authorization: `Token ${REPLICATE_KEY}` } })).json()
+              if (poll.status === "succeeded") { const out = Array.isArray(poll.output) ? poll.output[0] : poll.output; if (out) { currentImage = out; break } }
+              if (poll.status === "failed") break
+            }
+          }
+        } catch (e) { console.error("Shoes Flux pass failed:", e instanceof Error ? e.message : e) }
       }
 
       // If no FASHN ran at all, fall back to Flux text-based redress
