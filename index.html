@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  <script>
+    // GitHub Pages SPA: restore path from query param
+    (function() {
+      var p = window.location.search.match(/[?&]p=([^&]*)/);
+      if (p) {
+        window.history.replaceState(null, null,
+          '/' + decodeURIComponent(p[1]) +
+          (window.location.search.replace(/[?&]p=[^&]*/, '').replace(/^[?&]/, '?') || '') +
+          window.location.hash
+        );
+      }
+    })();
+  </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kathy · Atelier Privé</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-CSLV_n8C.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-BtqBX4v0.js">
+    <link rel="modulepreload" crossorigin href="/assets/motion-CIR3Dl5E.js">
+    <link rel="modulepreload" crossorigin href="/assets/supabase-DpHXRag5.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-DNPtcum0.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-Cedd03B9.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

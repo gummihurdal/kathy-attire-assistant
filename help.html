@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Help — Kathy Atelier Privé</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --obsidian: #080808;
+  --onyx: #111111;
+  --charcoal: #1a1a1a;
+  --muted: #2a2a2a;
+  --border: #2e2e2e;
+  --ivory: #f5f0e8;
+  --ivory-dim: #c8c0b0;
+  --ivory-faint: #8a8278;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-dark: #9a7a2e;
+  --gold-glow: rgba(201, 168, 76, 0.12);
+  --stone: #6b6560;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Jost', system-ui, sans-serif;
+  --ease-royal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--obsidian);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,26,26,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+::selection { background: var(--gold); color: var(--obsidian); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--obsidian); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+/* ── Layout ── */
+.page { position: relative; z-index: 1; }
+
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(8,8,8,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.top-bar-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 2rem;
+}
+.logo {
+  font-family: var(--font-display); font-style: italic;
+  color: var(--gold); font-size: 1.2rem; font-weight: 400;
+  text-decoration: none;
+}
+.logo-sub {
+  font-family: var(--font-body); font-style: normal;
+  color: var(--ivory-faint); font-size: 0.65rem;
+  letter-spacing: 0.12em; margin-left: 0.5rem;
+}
+.back-link {
+  font-family: var(--font-body); font-size: 0.7rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ivory-faint); text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--gold); }
+
+/* ── Hero ── */
+.hero {
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+  position: relative;
+}
+.hero::after {
+  content: '♛';
+  position: absolute;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4rem;
+  opacity: 0.04;
+  pointer-events: none;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  color: var(--ivory);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+.hero h1 em { color: var(--gold); font-weight: 400; }
+.gold-line {
+  display: block; width: 40px; height: 1px;
+  background: var(--gold); margin: 1rem auto 1.5rem;
+}
+.hero p {
+  font-size: 0.95rem;
+  color: var(--ivory-dim);
+  max-width: 520px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+/* ── Navigation pills ── */
+.nav-pills {
+  max-width: 1000px; margin: 0 auto 3rem;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; padding: 0 1.5rem;
+}
+.nav-pill {
+  font-family: var(--font-body);
+  font-size: 0.68rem; font-weight: 400;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ivory-faint);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 0.55rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.nav-pill:hover, .nav-pill.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-glow);
+}
+.nav-pill-icon { font-size: 0.85rem; }
+
+/* ── Content ── */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* Section */
+.section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 5rem;
+  animation: fadeUp 0.6s var(--ease-royal) both;
+}
+.section-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.section-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 300;
+  color: var(--ivory);
+  margin-bottom: 0.3rem;
+}
+.section h2 em { color: var(--gold); font-weight: 400; }
+.section-desc {
+  color: var(--ivory-dim);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* Steps */
+.steps { display: flex; flex-direction: column; gap: 1.25rem; }
+.step {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s;
+}
+.step:hover { border-color: rgba(201,168,76,0.25); }
+.step-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--gold);
+  font-weight: 300;
+  line-height: 1;
+  min-width: 1.5rem;
+  text-align: center;
+  opacity: 0.7;
+}
+.step-body { flex: 1; }
+.step-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--ivory);
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+.step-text {
+  font-size: 0.85rem;
+  color: var(--ivory-dim);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+/* Tips */
+.tip-box {
+  background: rgba(201,168,76,0.04);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.5rem;
+}
+.tip-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.tip-text {
+  font-size: 0.85rem;
+  color: var(--ivory-dim);
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* Feature grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.feature-card {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s;
+}
+.feature-card:hover { border-color: rgba(201,168,76,0.25); }
+.feature-card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.feature-card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ivory);
+  margin-bottom: 0.3rem;
+}
+.feature-card-text {
+  font-size: 0.8rem;
+  color: var(--ivory-faint);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* Category tags */
+.cat-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.75rem 0; }
+.cat-tag {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ivory-dim);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.75rem;
+  font-family: var(--font-body);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+  margin: 4rem 0;
+  opacity: 0.3;
+}
+
+/* FAQ */
+.faq { display: flex; flex-direction: column; gap: 0; }
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.faq-item:first-child { border-top: 1px solid var(--border); }
+.faq-item:hover { background: rgba(201,168,76,0.02); }
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ivory);
+  font-weight: 400;
+}
+.faq-toggle {
+  font-size: 1.2rem;
+  color: var(--gold);
+  transition: transform 0.3s;
+  font-weight: 300;
+}
+.faq-item.open .faq-toggle { transform: rotate(45deg); }
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s var(--ease-royal), padding 0.3s;
+  font-size: 0.85rem;
+  color: var(--ivory-dim);
+  font-weight: 300;
+  line-height: 1.7;
+  padding: 0 0;
+}
+.faq-item.open .faq-a {
+  max-height: 300px;
+  padding: 0 0 1.25rem;
+}
+
+/* Footer */
+.help-footer {
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 2rem;
+}
+.help-footer p {
+  font-size: 0.7rem;
+  color: var(--ivory-faint);
+  font-weight: 300;
+}
+.help-footer a { color: var(--gold); text-decoration: none; }
+
+/* Keyframes */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero { padding: 7rem 1.25rem 3rem; }
+  .content { padding: 0 1.25rem 5rem; }
+  .top-bar-inner { padding: 0.75rem 1.25rem; }
+  .step { flex-direction: column; gap: 0.5rem; }
+  .step-num { font-size: 1.2rem; }
+  .nav-pill { font-size: 0.6rem; padding: 0.45rem 0.8rem; }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <a href="https://my-outfit.azurenexus.com" class="logo">Kathy <span class="logo-sub">Atelier Privé</span></a>
+    <a href="https://my-outfit.azurenexus.com" class="back-link">← Back to App</a>
+  </div>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <p class="section-label" style="margin-bottom:0.75rem">Guide</p>
+  <h1>How to Use <em>Your Atelier</em></h1>
+  <span class="gold-line"></span>
+  <p>Everything you need to know about your private wardrobe app — from uploading your first piece to generating AI-curated outfits, virtual try-ons, and selling in the boutique.</p>
+</div>
+
+<!-- ── Nav Pills ── -->
+<div class="nav-pills">
+  <a href="#getting-started" class="nav-pill"><span class="nav-pill-icon">✦</span> Getting Started</a>
+  <a href="#wardrobe" class="nav-pill"><span class="nav-pill-icon">👗</span> Wardrobe</a>
+  <a href="#outfits" class="nav-pill"><span class="nav-pill-icon">✨</span> Outfit Generator</a>
+  <a href="#advisor" class="nav-pill"><span class="nav-pill-icon">♛</span> Style Advisor</a>
+  <a href="#mirror" class="nav-pill"><span class="nav-pill-icon">🪞</span> Magic Mirror</a>
+  <a href="#lookbook" class="nav-pill"><span class="nav-pill-icon">📖</span> Lookbook</a>
+  <a href="#boutique" class="nav-pill"><span class="nav-pill-icon">🛍</span> Boutique</a>
+  <a href="#messages" class="nav-pill"><span class="nav-pill-icon">💬</span> Messages</a>
+  <a href="#profile" class="nav-pill"><span class="nav-pill-icon">👤</span> Profile</a>
+  <a href="#faq" class="nav-pill"><span class="nav-pill-icon">?</span> FAQ</a>
+</div>
+
+<!-- ── Content ── -->
+<div class="content">
+
+  <!-- GETTING STARTED -->
+  <div class="section" id="getting-started">
+    <span class="section-icon">✦</span>
+    <p class="section-label">First Steps</p>
+    <h2>Getting <em>Started</em></h2>
+    <p class="section-desc">Kathy Atelier Privé is your personal AI-powered wardrobe assistant. It catalogues your clothes, generates outfit ideas using AI, lets you virtually try them on, and even has a private boutique for selling pieces you no longer wear.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Create Your Account</p>
+          <p class="step-text">Tap <strong>Sign In</strong> in the top-right corner and choose <strong>Create Account</strong>. Enter your email and a password (minimum 6 characters). You'll receive a confirmation email — click the link to activate your account.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Upload Your First Pieces</p>
+          <p class="step-text">Go to <strong>Wardrobe</strong> and tap <strong>+ Add Piece</strong>. Upload a photo and the AI stylist will automatically identify the item, suggest a name, detect colours, and assign a category. You can adjust anything before saving.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">Generate Your First Outfit</p>
+          <p class="step-text">Once you have at least 2 pieces, go to <strong>Outfits</strong>, pick a style direction (casual, business, evening…), and tap <strong>Create Outfit</strong>. The AI stylist will curate a complete look from your wardrobe with styling notes and colour harmony advice.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">Set Up Your Style Profile</p>
+          <p class="step-text">Visit <strong>Profile</strong> to tell the AI your body shape, height, what you like to emphasise, and what you prefer to avoid. This makes every outfit recommendation more personalised to you.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Pro Tip</p>
+      <p class="tip-text">The more pieces you upload, the better your outfit recommendations become. Aim for at least 10–15 items across different categories (tops, bottoms, shoes, bags) for the AI to have enough to work with.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WARDROBE -->
+  <div class="section" id="wardrobe">
+    <span class="section-icon">👗</span>
+    <p class="section-label">Your Collection</p>
+    <h2>The <em>Wardrobe</em></h2>
+    <p class="section-desc">Your wardrobe is the foundation of everything. This is where every piece of clothing, every shoe, and every accessory lives — beautifully catalogued and ready for the AI to style.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Adding a Piece</p>
+          <p class="step-text">Tap <strong>+ Add Piece</strong> to open the upload modal. Drag and drop a photo or tap to browse. The AI analyses your image instantly — it detects the item type, suggests a name, identifies colours, and writes a description. Review the details and save.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Editing Details</p>
+          <p class="step-text">After the AI fills in the details, you can adjust the name, switch the category, add or remove colours, change the brand, add a description, and tag seasons (Spring, Summer, Autumn, Winter) to help the AI recommend seasonally appropriate outfits.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">Browsing &amp; Filtering</p>
+          <p class="step-text">Use the category tabs to filter by type — Tops, Bottoms, Dresses, Outerwear, Shoes, Bags, Accessories, and Activewear. The search bar lets you find items by name, brand, or colour instantly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">Removing Pieces</p>
+          <p class="step-text">Hover or tap on any item card and use the delete option to remove it from your wardrobe. Consider listing it in the Boutique instead if it's still in good condition.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--ivory-faint); margin-top:1.5rem; font-weight:300">Supported categories:</p>
+    <div class="cat-tags">
+      <span class="cat-tag">Tops</span>
+      <span class="cat-tag">Bottoms</span>
+      <span class="cat-tag">Dresses</span>
+      <span class="cat-tag">Outerwear</span>
+      <span class="cat-tag">Shoes</span>
+      <span class="cat-tag">Bags</span>
+      <span class="cat-tag">Accessories</span>
+      <span class="cat-tag">Activewear</span>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Photo Tips</p>
+      <p class="tip-text">Photograph items on a flat surface or hanger against a plain background. Good lighting helps the AI identify colours accurately. One item per photo works best — the AI focuses on the main piece in the image.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- OUTFIT GENERATOR -->
+  <div class="section" id="outfits">
+    <span class="section-icon">✨</span>
+    <p class="section-label">AI Styling</p>
+    <h2>Outfit <em>Generator</em></h2>
+    <p class="section-desc">This is where the magic happens. The AI stylist looks at your entire wardrobe and creates complete, curated outfits based on the style direction and occasion you choose.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Choose a Style Direction</p>
+          <p class="step-text">Select from seven style profiles: <strong>Casual</strong> (relaxed everyday), <strong>Smart Casual</strong> (polished but approachable), <strong>Business</strong> (commanding and sharp), <strong>Formal</strong> (elegant occasions), <strong>Sporty</strong> (athletic chic), <strong>Evening</strong> (dinner and nightlife), or <strong>Weekend</strong> (laid-back weekend vibes).</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Add Context (Optional)</p>
+          <p class="step-text">Describe the occasion (e.g. "brunch with friends at a rooftop café" or "job interview at a creative agency"). You can also add preferences like "I want to wear my new blazer" or "no heels today". The more specific you are, the more tailored the result.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">Review Your Outfit</p>
+          <p class="step-text">The AI returns a named outfit with specific pieces from your wardrobe, individual styling notes for each item (how to wear it), a colour story explaining why the pieces work together, an accessories suggestion, and a stylist secret — a finishing touch that elevates the look.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">Save to Lookbook</p>
+          <p class="step-text">Love the outfit? Tap the heart icon to save it to your Lookbook for future reference. You can build an entire collection of go-to looks for different occasions.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Get Better Results</p>
+      <p class="tip-text">Set up your Style Profile first (in Profile) — the AI considers your body shape, height, and preferences when curating outfits. Also, try generating multiple outfits for the same style to see different combinations.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STYLE ADVISOR -->
+  <div class="section" id="advisor">
+    <span class="section-icon">♛</span>
+    <p class="section-label">Deep Analysis</p>
+    <h2>Style <em>Advisor</em></h2>
+    <p class="section-desc">The Style Advisor goes deeper than individual outfits — it analyses your entire wardrobe as a collection and creates a comprehensive style report with outfit suggestions for every occasion.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Run the Analysis</p>
+          <p class="step-text">You need at least 3 items in your wardrobe. Tap <strong>Analyse My Wardrobe</strong> and wait 20–30 seconds while the AI catalogues your pieces, analyses your colour palette, finds combinations, matches outfits to occasions, and writes your personal style report.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Browse by Occasion</p>
+          <p class="step-text">Filter results by occasion — School, Weekend, Sport, Party, Cosy Day, Date, or Evening Out. Each outfit comes with a name, the specific items, styling notes, and occasion-specific advice.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">Wardrobe Gaps</p>
+          <p class="step-text">The advisor identifies what's missing from your wardrobe and suggests key pieces that would unlock new outfit combinations. Think of it as a smart shopping list.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Advisor vs. Generator</p>
+      <p class="tip-text">The <strong>Outfit Generator</strong> creates one outfit at a time for a specific style. The <strong>Style Advisor</strong> analyses everything at once and gives you a full report with multiple outfits across all occasions. Use the Generator for quick daily inspiration and the Advisor for a comprehensive wardrobe review.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MAGIC MIRROR -->
+  <div class="section" id="mirror">
+    <span class="section-icon">🪞</span>
+    <p class="section-label">Virtual Try-On</p>
+    <h2>Magic <em>Mirror</em></h2>
+    <p class="section-desc">See outfits on yourself before getting dressed. Upload a photo of yourself, choose a style, and the AI generates a realistic image of you wearing the recommended outfit — complete with hair styling tips.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Upload Your Photo</p>
+          <p class="step-text">Drag and drop or tap to upload a full-body or half-body photo of yourself. You can save multiple photos and switch between them. Your first photo becomes the primary one used for try-ons.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Pick a Style</p>
+          <p class="step-text">Choose from Sporty, Casual, Smart Casual, Business, Evening, Formal, or Weekend. The AI first selects the perfect outfit from your wardrobe for that style, then generates a visualisation of you wearing it.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">View Your Look</p>
+          <p class="step-text">The result shows the generated image alongside the outfit details, individual item names, and a complete colour story. Below the outfit, you'll find <strong>hair styling tips</strong> specific to the style — recommended looks, techniques, and what to avoid.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">Share as Story Card</p>
+          <p class="step-text">Tap the download/share button to export your try-on result as a beautiful 9:16 Instagram Story card — complete with the outfit name, style label, and Kathy branding. Perfect for sharing your look with friends.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Best Photo Tips</p>
+      <p class="tip-text">Use a clear, well-lit photo against a simple background. Full-body shots give the best results. The AI uses advanced virtual try-on technology (IDM-VTON) to map your actual garment photos onto your body, then refines the result with AI image generation for a polished finish.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- LOOKBOOK -->
+  <div class="section" id="lookbook">
+    <span class="section-icon">📖</span>
+    <p class="section-label">Saved Looks</p>
+    <h2>Your <em>Lookbook</em></h2>
+    <p class="section-desc">Every outfit you save becomes part of your personal lookbook — a curated collection of go-to looks you can revisit any time.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">♛</div>
+        <p class="feature-card-title">Named Outfits</p>
+        <p class="feature-card-text">Each saved outfit has a unique name, tagline, and style tags for easy browsing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🎨</div>
+        <p class="feature-card-title">Colour Stories</p>
+        <p class="feature-card-text">See the colour harmony behind each look — why those pieces work together.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">📝</div>
+        <p class="feature-card-title">Styling Notes</p>
+        <p class="feature-card-text">Every item comes with specific styling instructions — how to wear it in this outfit.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🗑</div>
+        <p class="feature-card-title">Easy Management</p>
+        <p class="feature-card-text">Remove any outfit from your lookbook with a single tap. Your collection, your rules.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BOUTIQUE -->
+  <div class="section" id="boutique">
+    <span class="section-icon">🛍</span>
+    <p class="section-label">Buy &amp; Sell</p>
+    <h2>The <em>Boutique</em></h2>
+    <p class="section-desc">A private marketplace for pre-loved fashion. List pieces you no longer wear, browse what others are selling, and communicate directly through in-app messaging. Every listing feels like a personal boutique discovery.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Browsing Listings</p>
+          <p class="step-text">The Boutique shows all active listings in a clean grid with photos, brand, title, price, and condition badge. Filter by category and brand. Tap any listing to see full details, multiple images, description, and size information.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Creating a Listing</p>
+          <p class="step-text">Tap <strong>Sell Something</strong> to list a piece. Upload up to 5 photos (drag-and-drop supported), then fill in the title, select a brand from the list, choose a category, pick the right size (sizes adapt to the category — shoe sizes for shoes, ring sizes for jewellery, etc.), set the condition, enter your price in EUR, and add a description.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">Adding to Cart</p>
+          <p class="step-text">When you find something you like, tap the shopping bag icon to add it to your cart. The cart is accessible from the header at all times — it slides open as a drawer showing all your items and the total price.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">Contacting the Seller</p>
+          <p class="step-text">On any listing detail page, use the message panel to ask questions, negotiate, or arrange the purchase directly with the seller. Messages are threaded per listing.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--ivory-faint); margin-top:1.5rem; font-weight:300">Condition ratings:</p>
+    <div class="cat-tags">
+      <span class="cat-tag">New · Tagged</span>
+      <span class="cat-tag">New · Untagged</span>
+      <span class="cat-tag">Excellent</span>
+      <span class="cat-tag">Very Good</span>
+      <span class="cat-tag">Good</span>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Selling Tip</p>
+      <p class="tip-text">Listings with clear, well-lit photos sell faster. Show the item from multiple angles, include close-ups of any details or imperfections, and write an honest description. Mention the original retail price to help buyers understand the value.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MESSAGES -->
+  <div class="section" id="messages">
+    <span class="section-icon">💬</span>
+    <p class="section-label">Communication</p>
+    <h2><em>Messages</em></h2>
+    <p class="section-desc">The in-app messaging system lets buyers and sellers communicate directly about boutique listings. All messages are private and threaded per listing.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">📥</div>
+        <p class="feature-card-title">Inbox</p>
+        <p class="feature-card-text">See all your conversations at a glance with the listing title, last message preview, and timestamp.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🔴</div>
+        <p class="feature-card-title">Unread Badge</p>
+        <p class="feature-card-text">The Messages icon in the header shows an unread count so you never miss a message.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">💬</div>
+        <p class="feature-card-title">Threaded Chats</p>
+        <p class="feature-card-text">Each listing has its own message thread — conversations stay organised and contextual.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">⚡</div>
+        <p class="feature-card-title">Quick Reply</p>
+        <p class="feature-card-text">Reply directly from the listing page or from the Messages inbox — whichever is more convenient.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PROFILE -->
+  <div class="section" id="profile">
+    <span class="section-icon">👤</span>
+    <p class="section-label">Personalisation</p>
+    <h2>Style <em>Profile</em></h2>
+    <p class="section-desc">Your style profile teaches the AI what works for your body and what you prefer. The more you fill in, the more personalised every recommendation becomes.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p class="step-title">Body Shape</p>
+          <p class="step-text">Choose from Hourglass, Pear, Apple, Rectangle, or Inverted Triangle. Each shape comes with suggested styles that flatter your proportions and specific things to avoid. The AI uses this to select pieces that work best for your body.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p class="step-title">Height</p>
+          <p class="step-text">Select Petite (under 163cm), Average (163–173cm), or Tall (over 173cm). This affects proportions advice — like whether to go cropped or full-length, or how to balance oversized pieces.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p class="step-title">What to Emphasise</p>
+          <p class="step-text">Tell the AI which features you want to highlight — Waist, Legs, Shoulders, Bust, or Hips. The outfit recommendations will favour silhouettes and styling techniques that draw attention to your chosen areas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <p class="step-title">What to Avoid</p>
+          <p class="step-text">Set boundaries: Tight fits, Short skirts, Low necklines, Bright colours, Loud prints, or Cropped tops. The AI will respect these preferences in every recommendation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <p class="tip-label">✦ Profile Tip</p>
+      <p class="tip-text">Your style profile is saved locally on your device. If you switch devices, you'll need to set it up again. The profile data is used by the Outfit Generator, Style Advisor, and Magic Mirror to personalise all recommendations.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SHOPPING CART -->
+  <div class="section" id="cart">
+    <span class="section-icon">🛒</span>
+    <p class="section-label">Boutique</p>
+    <h2>Shopping <em>Cart</em></h2>
+    <p class="section-desc">The cart drawer is always accessible from the shopping bag icon in the header. It slides open from the right showing your selected items and total.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">👜</div>
+        <p class="feature-card-title">Always Visible</p>
+        <p class="feature-card-text">The cart icon shows your item count on every page. Tap to slide open the cart drawer without leaving your current page.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">✕</div>
+        <p class="feature-card-title">Quick Remove</p>
+        <p class="feature-card-text">Remove items individually from the cart, or clear everything at once to start fresh.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">€</div>
+        <p class="feature-card-title">Running Total</p>
+        <p class="feature-card-text">See the total price update in real time as you add or remove items.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FAQ -->
+  <div class="section" id="faq">
+    <span class="section-icon">?</span>
+    <p class="section-label">Common Questions</p>
+    <h2>Frequently <em>Asked</em></h2>
+
+    <div class="faq">
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Do I need an account to use the app?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">You can browse the app in Demo Mode without an account, but to save your wardrobe, generate personalised outfits, use the Magic Mirror, and access the Boutique, you'll need to create a free account.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How does the AI identify my clothes?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">When you upload a photo, the image is sent to Claude AI (by Anthropic) through a secure backend. It analyses the image to detect the type of garment, suggest a name, identify colours, and write a description. You can adjust anything before saving.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How many items do I need for outfit recommendations?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">You need at least 2 items for the Outfit Generator and 3 for the Style Advisor. For best results, upload 10–15 items across different categories — the more variety the AI has, the more creative and complete the outfits.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Is my data private?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">Yes. Your wardrobe photos and data are stored in your personal account and are not visible to other users. Boutique listings are public by design, but your wardrobe, lookbook, profile photos, and style profile are completely private.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What image formats are supported?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">The app supports JPG, JPEG, PNG, and WebP formats. For best results, use photos with good lighting against a simple background. Maximum file size for boutique listings is 10MB per image.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How does the virtual try-on work?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">The Magic Mirror uses a three-tier approach: first, it attempts IDM-VTON (a garment-to-body mapping technology) to place your actual clothing photos onto your body. If that's not possible, it uses Flux Kontext to redress your photo in the selected style. As a final fallback, it generates a pure AI fashion image matching the outfit.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Can I use the app on my phone?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">Yes, the app is fully responsive and works on phones, tablets, and desktops. On mobile, the navigation collapses into a hamburger menu. All features — including photo upload, outfit generation, and the boutique — work on mobile.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How do payments work in the Boutique?<span class="faq-toggle">+</span></div>
+        <div class="faq-a">The Boutique currently operates as a listing and messaging platform. Buyers and sellers connect through in-app messaging to arrange payment and delivery directly. There is no built-in payment processing at this time.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Footer ── -->
+<div class="help-footer">
+  <p>
+    <span style="color:var(--gold); font-family:var(--font-display); font-style:italic">Kathy</span>
+    <span style="margin-left:0.4rem; letter-spacing:0.1em">Atelier Privé</span>
+    <span style="margin:0 0.75rem; opacity:0.3">·</span>
+    <a href="https://my-outfit.azurenexus.com">Open App</a>
+  </p>
+</div>
+
+</div>
+</body>
+</html>
